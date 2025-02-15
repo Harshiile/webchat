@@ -4,13 +4,16 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import ToastProvider from "../../components/ToastProvider";
+import { useDebouncedCallback } from 'use-debounce';
 
 const Signup = () => {
     const [username, setUsername] = useState("");
+    const [name, setname] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [avatar, setAvatar] = useState("/user.png");
+    const [avatar, setAvatar] = useState("/uploads/user.png");
     const [passwordType, setPasswordType] = useState("password");
+    const [errorMessage, setErrorMessage] = useState(null)
     const passwordRef = useRef();
 
     const handleAvatarChange = (e) => {
@@ -33,13 +36,40 @@ const Signup = () => {
             return;
         }
 
-        console.log({ username, email, password, avatar });
+        const file = e.target[0].files[0]
 
-        // Simulate signup API call
-        toast.success("Signup successful! 🎉", {
-            duration: 5000,
-            style: { backgroundColor: "#16a34a", color: "white", fontSize: "1rem" },
-        });
+        const formData = new FormData();
+        formData.append('avatar', file);
+        formData.append('name', name);
+        formData.append('username', username);
+        formData.append('email', email);
+        formData.append('password', password);
+
+        fetch('http://localhost:3000/api/v0/signup', {
+            method: 'POST',
+            body: formData
+        })
+            .then(res => res.json())
+            .then(({ statusCode, message }) => {
+                if (statusCode == 200) {
+                    toast.success(`${message} 🎉`, {
+                        duration: 5000,
+                        style: { backgroundColor: "#16a34a", color: "white", fontSize: "1rem" },
+                    });
+                }
+                else {
+                    toast.success(`${message} `, {
+                        duration: 5000,
+                        style: { backgroundColor: "#dc2626", color: "white", fontSize: "1rem" },
+                    });
+                }
+            })
+            .catch(err => {
+                toast.dismiss(`Server Error`, {
+                    duration: 5000,
+                    style: { backgroundColor: "#dc2626", color: "white", fontSize: "1rem" },
+                });
+            })
     };
 
     const transitionVariants = {
@@ -47,6 +77,19 @@ const Signup = () => {
         visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeInOut" } },
     };
 
+    const usernameCheck = useDebouncedCallback((username) => {
+        fetch('http://localhost:3000/api/v0/get/username', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username })
+        })
+            .then(res => res.json())
+            .then(({ statusCode, message }) => {
+                statusCode == 401 ? setErrorMessage(message) : setErrorMessage(null)
+            })
+    }, 300)
     return (
         <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
             <ToastProvider />
@@ -61,11 +104,12 @@ const Signup = () => {
                 </h1>
                 <p className="text-gray-400 mb-8 text-center">Sign up to join @WebChat</p>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-4" encType="multipart/form-data">
                     <div className="flex justify-center">
                         <label className="relative cursor-pointer">
                             <input
                                 type="file"
+                                name='avatar'
                                 accept="image/*"
                                 className="hidden"
                                 onChange={handleAvatarChange}
@@ -77,13 +121,29 @@ const Signup = () => {
                     </div>
                     <div>
                         <input
+                            name="name"
+                            type="text"
+                            value={name}
+                            onChange={(e) => setname(e.target.value)}
+                            placeholder="Name"
+                            className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all"
+                        />
+                    </div>
+                    <div>
+                        <input
                             name="username"
                             type="text"
                             value={username}
-                            onChange={(e) => setUsername(e.target.value)}
+                            onChange={(e) => {
+                                setUsername(e.target.value)
+                                usernameCheck(e.target.value)
+                            }}
                             placeholder="Username"
                             className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all"
                         />
+                        {
+                            errorMessage && <p className="text-red-500 pt-3 ml-3">{errorMessage}</p>
+                        }
                     </div>
                     <div>
                         <input

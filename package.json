@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc --watch",
     "start": "node dist/index.js",
-    "dev":"nodemon dist/index.js"
+    "dev": "nodemon dist/index.js"
   },
   "keywords": [],
   "author": "",
@@ -16,6 +16,14 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.10.1",
+    "multer": "^1.4.5-lts.1",
     "nodemon": "^3.1.9"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/jsonwebtoken": "^9.0.8",
+    "@types/multer": "^1.4.12"
   }
 }

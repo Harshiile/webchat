@@ -28,10 +28,36 @@ const Login = () => {
             });
             return;
         }
-        toast.success("Login successful! 🎉", {
-            duration: 5000,
-            style: { backgroundColor: "#16a34a", color: "white", fontSize: "1rem" },
-        });
+
+        fetch('http://localhost:3000/api/v0/login', {
+            method: 'POST',
+            credentials: "include",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email, password })
+        })
+            .then(res => res.json())
+            .then(({ statusCode, message }) => {
+                if (statusCode == 200) {
+                    toast.success(`${message} 🎉`, {
+                        duration: 5000,
+                        style: { backgroundColor: "#16a34a", color: "white", fontSize: "1rem" },
+                    });
+                }
+                else {
+                    toast.success(`${message} `, {
+                        duration: 5000,
+                        style: { backgroundColor: "#dc2626", color: "white", fontSize: "1rem" },
+                    });
+                }
+            })
+            .catch(err => {
+                toast.dismiss(`Server Error`, {
+                    duration: 5000,
+                    style: { backgroundColor: "#dc2626", color: "white", fontSize: "1rem" },
+                });
+            })
     };
     const transitionVariants = {
         hidden: { opacity: 0, y: 20 },
