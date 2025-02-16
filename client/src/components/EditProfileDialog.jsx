@@ -2,19 +2,38 @@ import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 
 const EditProfileDialog = ({ isOpen, onClose, onSave, currentData }) => {
-    const [formData, setFormData] = useState(currentData);
-
+    const [updateData, setUpdateData] = useState(currentData);
     useEffect(() => {
-        setFormData(currentData);
+        setUpdateData({
+            avatar: `/uploads/${currentData.avatar}`,
+            name: currentData.name,
+            username: currentData.username
+        });
     }, [currentData]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        onSave(formData);
+        const file = e.target[0].files[0]
+
+        const formData = new FormData();
+        formData.append('avatar', file);
+        formData.append('name', updateData.name);
+        formData.append('username', updateData.username);
+
+        fetch('http://localhost:3000/api/v0/update/profile', {
+            method: 'POST',
+            credentials: "include",
+            body: formData
+        })
+            .then(res => {
+                if (res.status == 200) {
+                    console.log(updateData);
+                    onSave(updateData);
+                }
+            })
     };
 
     if (!isOpen) return null;
-
     return (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
             <div className="bg-zinc-900 rounded-xl w-full max-w-md p-6 relative">
@@ -27,17 +46,21 @@ const EditProfileDialog = ({ isOpen, onClose, onSave, currentData }) => {
 
                 <h2 className="text-xl font-bold mb-6">Edit Profile</h2>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-4" encType="multipart/form-data">
                     <div>
                         <label className="relative cursor-pointer flex flex-col items-center gap-y-2">Avatar
                             <input
                                 type="file"
                                 accept="image/*"
                                 className="hidden"
-                                onChange={(e) => setFormData({ ...formData, avatar: URL.createObjectURL(e.target.files[0]) })}
+                                onChange={(e) => {
+                                    const img = URL.createObjectURL(e.target.files[0])
+                                    setUpdateData({ ...updateData, avatar: img })
+                                }
+                                }
                             />
                             <div className="w-32 h-32 rounded-full border-2 border-white flex items-center justify-center overflow-hidden bg-gray-700">
-                                <img src={formData.avatar} alt="Avatar" className="w-full h-full object-cover" />
+                                <img src={`${updateData.avatar}`} alt="Avatar" className="w-full h-full object-cover" />
                             </div>
                         </label>
                     </div>
@@ -48,8 +71,8 @@ const EditProfileDialog = ({ isOpen, onClose, onSave, currentData }) => {
                         </label>
                         <input
                             type="text"
-                            value={formData.uname}
-                            onChange={(e) => setFormData({ ...formData, uname: e.target.value })}
+                            value={updateData.name}
+                            onChange={(e) => setUpdateData({ ...updateData, name: e.target.value })}
                             className="w-full px-3 py-2 bg-zinc-800 rounded-lg border border-zinc-700 text-white focus:outline-none focus:ring-2 focus:ring-zinc-600"
                             placeholder="John Doe"
                         />
@@ -61,8 +84,8 @@ const EditProfileDialog = ({ isOpen, onClose, onSave, currentData }) => {
                         </label>
                         <input
                             type="text"
-                            value={formData.username}
-                            onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                            value={updateData.username}
+                            onChange={(e) => setUpdateData({ ...updateData, username: e.target.value })}
                             className="w-full px-3 py-2 bg-zinc-800 rounded-lg border border-zinc-700 text-white focus:outline-none focus:ring-2 focus:ring-zinc-600"
                             placeholder="johndoe123"
                         />

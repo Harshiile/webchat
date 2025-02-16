@@ -4,11 +4,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-const login_1 = require("../controllers/posts/login");
-const signup_1 = require("../controllers/posts/signup");
-const usernameCheck_1 = require("../controllers/gets/usernameCheck");
+const login_1 = require("../controllers/login");
+const signup_1 = require("../controllers/signup");
+const usernameCheck_1 = require("../controllers/usernameCheck");
 const path_1 = __importDefault(require("path"));
 const multer_1 = __importDefault(require("multer"));
+const update_1 = require("../controllers/update");
+const userdata_1 = require("../controllers/fetch/userdata");
 const storage = multer_1.default.diskStorage({
     destination: function (req, file, cb) {
         cb(null, 'client/public/uploads');
@@ -23,7 +25,9 @@ const storage = multer_1.default.diskStorage({
 });
 const upload = (0, multer_1.default)({ storage });
 const router = (0, express_1.Router)();
-router.post('/api/v0/get/username', usernameCheck_1.usernameCheck);
-router.post('/api/v0/login', login_1.loginController);
-router.post('/api/v0/signup', upload.single('avatar'), signup_1.signUpController);
+router.post('/get/username', usernameCheck_1.usernameCheck);
+router.get('/get/user', userdata_1.userDataFromAuth);
+router.post('/update/profile', upload.single('avatar'), update_1.updateUserInDB);
+router.post('/login', login_1.loginController);
+router.post('/signup', upload.single('avatar'), signup_1.signUpController);
 exports.default = router;

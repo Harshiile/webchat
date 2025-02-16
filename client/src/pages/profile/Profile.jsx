@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { BellRing, MessageCircle, LogOut, Edit2, X, Check, User } from "lucide-react";
 import { toast } from "sonner";
@@ -6,12 +6,29 @@ import ToastProvider from '../../components/ToastProvider'
 import EditProfileDialog from "../../components/EditProfileDialog";
 
 const Profile = () => {
-    // Dummy user data (Replace with API data)
     const [user, setUser] = useState({
-        avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1760&q=80",
-        uname: "John Doe",
-        username: "johndoe123"
+        avatar: "",
+        name: "",
+        username: ""
     });
+
+    useEffect(() => {
+        fetch('http://localhost:3000/api/v0/get/user', {
+            credentials: "include"
+        })
+            .then(res => res.json())
+            .then(({ statusCode, data }) => {
+                if (statusCode == 200) {
+                    setUser({
+                        username: data.user.username,
+                        name: data.user.name,
+                        avatar: data.user.avatar
+                    })
+                }
+            })
+    }, [])
+
+
 
     // Dummy notifications data
     const [notifications, setNotifications] = useState([
@@ -41,6 +58,7 @@ const Profile = () => {
     const handleProfileUpdate = (newData) => {
         setUser(newData);
         setShowEditDialog(false);
+        window.location.reload()
         toast.success("Profile updated successfully!");
     };
 
@@ -140,12 +158,12 @@ const Profile = () => {
                     <div className="relative group">
                         <img
                             className="w-24 h-24 md:w-32 md:h-32 border-2 border-zinc-700 object-cover rounded-full transition-transform duration-300 group-hover:scale-105"
-                            src={user.avatar}
+                            src={`/uploads/${user.avatar}`}
                             alt="User Avatar"
                         />
                     </div>
                     <div className="flex flex-col items-center md:items-start">
-                        <h2 className="font-bold text-2xl md:text-3xl">{user.uname}</h2>
+                        <h2 className="font-bold text-2xl md:text-3xl">{user.name}</h2>
                         <p className="font-semibold text-zinc-400 mt-2">@{user.username}</p>
                     </div>
                 </div>

@@ -1,6 +1,6 @@
 export interface APIResponse {
     statusCode: number,
     message: string,
-    rediectUrl?: string,
+    redirectUrl?: string,
     data?: object
 }

@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
-import { APIResponse } from '../../types/APIResponse'
-import { userModel } from '../../models/schema'
+import { APIResponse } from '../types/APIResponse'
+import { getUserByUsername } from '../models/schema'
+import { UserAuth } from '../types/UserAuth'
 
 interface Username {
     username: string
@@ -9,8 +10,8 @@ interface Username {
 export const usernameCheck = async (req: Request<{}, {}, Username>, res: Response<APIResponse>) => {
     const { username }: Username = req.body
     try {
-        const [usernameExist] = await userModel.find({ username })
-        if (!usernameExist) {
+        const user: UserAuth = await getUserByUsername(username)
+        if (!user) {
             res.json({
                 statusCode: 200,
                 message: 'Successfully Username Created'
@@ -24,7 +25,7 @@ export const usernameCheck = async (req: Request<{}, {}, Username>, res: Respons
         }
     } catch (error) {
         res.json({
-            statusCode: 401,
+            statusCode: 500,
             message: 'Server error'
         })
     }

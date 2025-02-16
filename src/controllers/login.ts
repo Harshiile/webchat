@@ -1,8 +1,8 @@
-import { CookieOptions, Request, Response } from 'express'
-import { APIResponse } from '../../types/APIResponse'
-import { userModel } from '../../models/schema'
-import { UserAuth } from '../../types/UserAuth';
-import { cookieGenerator } from '../../lib/cookie';
+import { Request, Response } from 'express'
+import { APIResponse } from '../types/APIResponse'
+import { cookieGenerator } from '../lib/cookie';
+import { getUserByEmail } from '../models/schema';
+import { UserAuth } from '../types/UserAuth';
 
 interface LoginData {
     email: string,
@@ -11,18 +11,18 @@ interface LoginData {
 
 export const loginController = async (req: Request<{}, {}, LoginData>, res: Response<APIResponse>) => {
     const { email, password } = req.body;
-    const [user]: UserAuth[] = await userModel.find({ email });
+    const user: UserAuth = await getUserByEmail(email)
     if (user) {
         if (user.password == password) {
-            const { name, avatar } = user
-            const loginCookie = cookieGenerator({ name, avatar })
+            const { name, avatar, username } = user
+            const loginCookie = cookieGenerator({ username, name, avatar })
             res.cookie('auth', loginCookie, {
                 httpOnly: true
             })
             res.json({
                 statusCode: 200,
                 message: 'Login Successfully',
-                rediectUrl: '/profile'
+                redirectUrl: '/profile'
             })
         }
         else

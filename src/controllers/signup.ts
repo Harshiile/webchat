@@ -1,17 +1,17 @@
 import { Request, Response } from 'express'
-import { APIResponse } from '../../types/APIResponse'
-import { userModel } from '../../models/schema'
-import { UserAuth } from '../../types/UserAuth';
+import { APIResponse } from '../types/APIResponse'
+import { UserAuth } from '../types/UserAuth';
+import { getUserByEmail, userAdd } from '../models/schema';
 
 
 export const signUpController = async (req: Request<{}, {}, UserAuth>, res: Response<APIResponse>) => {
     const { email, password, username, name }: UserAuth = req.body;
     const avatar = req.file ? req.file.filename : 'user.png';
 
-    const [user]: UserAuth[] = await userModel.find({ email });
+    const user: UserAuth = await getUserByEmail(email)
     if (!user) {
         try {
-            await userModel.create({
+            await userAdd({
                 email,
                 password,
                 username,

@@ -1,9 +1,11 @@
 import { Router } from 'express'
-import { loginController } from '../controllers/posts/login'
-import { signUpController } from '../controllers/posts/signup'
-import { usernameCheck } from '../controllers/gets/usernameCheck'
+import { loginController } from '../controllers/login'
+import { signUpController } from '../controllers/signup'
+import { usernameCheck } from '../controllers/usernameCheck'
 import path from 'path'
 import multer from 'multer';
+import { updateUserInDB } from '../controllers/update'
+import { userDataFromAuth } from '../controllers/fetch/userdata'
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -18,11 +20,14 @@ const storage = multer.diskStorage({
     }
 })
 const upload = multer({ storage })
-
 const router = Router()
 
-router.post('/api/v0/get/username', usernameCheck)
-router.post('/api/v0/login', loginController)
-router.post('/api/v0/signup', upload.single('avatar'), signUpController)
+
+router.post('/get/username', usernameCheck)
+router.get('/get/user', userDataFromAuth)
+
+router.post('/update/profile', upload.single('avatar'), updateUserInDB)
+router.post('/login', loginController)
+router.post('/signup', upload.single('avatar'), signUpController)
 
 export default router

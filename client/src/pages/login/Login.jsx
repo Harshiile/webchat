@@ -12,6 +12,7 @@ const Login = () => {
     const [passwordType, setPasswordType] = useState('password')
     const passwordRef = useRef();
 
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!email) {
@@ -38,12 +39,13 @@ const Login = () => {
             body: JSON.stringify({ email, password })
         })
             .then(res => res.json())
-            .then(({ statusCode, message }) => {
+            .then(({ statusCode, message, redirectUrl }) => {
                 if (statusCode == 200) {
                     toast.success(`${message} 🎉`, {
                         duration: 5000,
                         style: { backgroundColor: "#16a34a", color: "white", fontSize: "1rem" },
                     });
+                    window.location.href = redirectUrl
                 }
                 else {
                     toast.success(`${message} `, {
