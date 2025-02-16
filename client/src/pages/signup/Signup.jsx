@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { ArrowRight, Lock, Unlock } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import ToastProvider from "../../components/ToastProvider";
@@ -47,15 +47,19 @@ const Signup = () => {
 
         fetch('http://localhost:3000/api/v0/signup', {
             method: 'POST',
+            credentials: "include",
             body: formData
         })
             .then(res => res.json())
-            .then(({ statusCode, message }) => {
+            .then(({ statusCode, message, redirectUrl }) => {
                 if (statusCode == 200) {
                     toast.success(`${message} 🎉`, {
                         duration: 5000,
                         style: { backgroundColor: "#16a34a", color: "white", fontSize: "1rem" },
                     });
+                    setTimeout(() => {
+                        window.location.href = redirectUrl
+                    }, 1000);
                 }
                 else {
                     toast.success(`${message} `, {
@@ -78,6 +82,7 @@ const Signup = () => {
     };
 
     const usernameCheck = useDebouncedCallback((username) => {
+        if (!username) return;
         fetch('http://localhost:3000/api/v0/get/username', {
             method: 'POST',
             headers: {
@@ -90,6 +95,15 @@ const Signup = () => {
                 statusCode == 401 ? setErrorMessage(message) : setErrorMessage(null)
             })
     }, 300)
+
+
+    const errorVariants = {
+        initial: { opacity: 0, y: -5 },
+        animate: { opacity: 1, y: 0 },
+        animate: { opacity: 1, y: 0 },
+        exit: { opacity: 0, y: -5 }
+    };
+
     return (
         <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
             <ToastProvider />
@@ -114,7 +128,7 @@ const Signup = () => {
                                 className="hidden"
                                 onChange={handleAvatarChange}
                             />
-                            <div className="w-32 h-32 rounded-full border-2 border-white flex items-center justify-center overflow-hidden bg-gray-700">
+                            <div className="w-32 h-32 rounded-full border-2 border-white flex items-center justify-center overflow-hidden bg-gray-700 hover:border-gray-300 transition-colors">
                                 <img src={avatar} alt="Avatar" className="w-full h-full object-cover" />
                             </div>
                         </label>
@@ -141,9 +155,19 @@ const Signup = () => {
                             placeholder="Username"
                             className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all"
                         />
-                        {
-                            errorMessage && <p className="text-red-500 pt-3 ml-3">{errorMessage}</p>
-                        }
+                        <AnimatePresence mode="wait">
+                            {errorMessage && (
+                                <motion.p
+                                    variants={errorVariants}
+                                    initial="initial"
+                                    animate="animate"
+                                    exit="exit"
+                                    className="text-red-500 pt-3 ml-3 overflow-hidden"
+                                >
+                                    {errorMessage}
+                                </motion.p>
+                            )}
+                        </AnimatePresence>
                     </div>
                     <div>
                         <input
@@ -166,17 +190,23 @@ const Signup = () => {
                                 placeholder="Password"
                                 className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all"
                             />
-                            {passwordType === "password" ? (
-                                <Lock
-                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500 cursor-pointer hover:text-white transition-colors"
-                                    onClick={() => setPasswordType("text")}
-                                />
-                            ) : (
-                                <Unlock
-                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500 cursor-pointer hover:text-white transition-colors"
-                                    onClick={() => setPasswordType("password")}
-                                />
-                            )}
+                            <motion.div
+                                whileHover={{ scale: 1.1 }}
+                                whileTap={{ scale: 0.95 }}
+                                className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                            >
+                                {passwordType === "password" ? (
+                                    <Lock
+                                        className="h-5 w-5 text-gray-500 cursor-pointer hover:text-white transition-colors"
+                                        onClick={() => setPasswordType("text")}
+                                    />
+                                ) : (
+                                    <Unlock
+                                        className="h-5 w-5 text-gray-500 cursor-pointer hover:text-white transition-colors"
+                                        onClick={() => setPasswordType("password")}
+                                    />
+                                )}
+                            </motion.div>
                         </div>
                     </div>
                     <div className="text-center mt-6">
@@ -190,13 +220,15 @@ const Signup = () => {
                             </Link>
                         </p>
                     </div>
-                    <button
+                    <motion.button
                         type="submit"
+                        whileHover={{ scale: 1.01 }}
+                        whileTap={{ scale: 0.99 }}
                         className="w-full bg-white text-black py-3 rounded-xl hover:bg-gray-100 transition-colors flex items-center justify-center group cursor-pointer font-medium"
                     >
                         Sign up
                         <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                    </button>
+                    </motion.button>
                 </form>
             </motion.div>
         </div>
@@ -204,4 +236,3 @@ const Signup = () => {
 };
 
 export default Signup;
-

@@ -11,6 +11,7 @@ const path_1 = __importDefault(require("path"));
 const multer_1 = __importDefault(require("multer"));
 const update_1 = require("../controllers/update");
 const userdata_1 = require("../controllers/fetch/userdata");
+const logout_1 = require("../controllers/logout");
 const storage = multer_1.default.diskStorage({
     destination: function (req, file, cb) {
         cb(null, 'client/public/uploads');
@@ -30,4 +31,5 @@ router.get('/get/user', userdata_1.userDataFromAuth);
 router.post('/update/profile', upload.single('avatar'), update_1.updateUserInDB);
 router.post('/login', login_1.loginController);
 router.post('/signup', upload.single('avatar'), signup_1.signUpController);
+router.post('/logout', logout_1.logoutUser);
 exports.default = router;

@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.signUpController = void 0;
 const schema_1 = require("../models/schema");
+const cookie_1 = require("../lib/cookie");
 const signUpController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password, username, name } = req.body;
     const avatar = req.file ? req.file.filename : 'user.png';
@@ -24,9 +25,15 @@ const signUpController = (req, res) => __awaiter(void 0, void 0, void 0, functio
                 avatar,
                 name
             });
+            const loginCookie = (0, cookie_1.cookieGenerator)({ username, name, avatar });
+            console.log(loginCookie);
+            res.cookie('auth', loginCookie, {
+                httpOnly: true
+            });
             res.json({
                 statusCode: 200,
-                message: 'Signup Successfully'
+                message: 'Signup Successfully',
+                redirectUrl: '/profile'
             });
         }
         catch (error) {

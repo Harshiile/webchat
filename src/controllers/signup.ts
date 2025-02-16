@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import { APIResponse } from '../types/APIResponse'
 import { UserAuth } from '../types/UserAuth';
 import { getUserByEmail, userAdd } from '../models/schema';
+import { cookieGenerator } from '../lib/cookie';
 
 
 export const signUpController = async (req: Request<{}, {}, UserAuth>, res: Response<APIResponse>) => {
@@ -18,9 +19,15 @@ export const signUpController = async (req: Request<{}, {}, UserAuth>, res: Resp
                 avatar,
                 name
             })
+            const loginCookie = cookieGenerator({ username, name, avatar })
+            console.log(loginCookie);
+            res.cookie('auth', loginCookie, {
+                httpOnly: true
+            })
             res.json({
                 statusCode: 200,
-                message: 'Signup Successfully'
+                message: 'Signup Successfully',
+                redirectUrl: '/profile'
             })
         } catch (error) {
             res.json({

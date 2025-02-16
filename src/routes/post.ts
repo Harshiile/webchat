@@ -6,6 +6,7 @@ import path from 'path'
 import multer from 'multer';
 import { updateUserInDB } from '../controllers/update'
 import { userDataFromAuth } from '../controllers/fetch/userdata'
+import { logoutUser } from '../controllers/logout'
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -29,5 +30,6 @@ router.get('/get/user', userDataFromAuth)
 router.post('/update/profile', upload.single('avatar'), updateUserInDB)
 router.post('/login', loginController)
 router.post('/signup', upload.single('avatar'), signUpController)
+router.post('/logout', logoutUser)
 
 export default router

@@ -62,6 +62,22 @@ const Profile = () => {
         toast.success("Profile updated successfully!");
     };
 
+    const logoutHandler = () => {
+        fetch('http://localhost:3000/api/v0/logout', {
+            method: 'POST',
+            credentials: "include"
+        }).then(res => res.json()).then(({ redirectUrl, statusCode }) => {
+            if (statusCode == 200) {
+                window.location.href = redirectUrl
+            }
+            else {
+                toast.error("Server Error", {
+                    duration: 4000,
+                    style: { backgroundColor: "#dc2626", color: "white", fontSize: "1rem" },
+                });
+            }
+        })
+    }
     return (
         <div className="min-h-screen flex flex-col items-center bg-black text-white">
             <ToastProvider />
@@ -194,16 +210,18 @@ const Profile = () => {
 
                 {/* Bottom Buttons */}
                 <div className="flex justify-center gap-4 mt-4 p-4">
-                    <button className="flex items-center gap-2 cursor-pointer bg-zinc-800 hover:bg-zinc-700 py-2 px-6 font-bold text-lg rounded-xl transition-colors duration-200">
+                    <Link
+                        to='/chat'
+                        className="flex items-center gap-2 cursor-pointer bg-zinc-800 hover:bg-zinc-700 py-2 px-6 font-bold text-lg rounded-xl transition-colors duration-200">
                         <MessageCircle className="w-5 h-5" />
                         <span>Chat</span>
-                    </button>
-                    <Link to="/logout">
-                        <button className="flex items-center gap-2 cursor-pointer hover:bg-red-700 py-2 px-6 font-bold text-lg rounded-xl transition-colors duration-200 bg-red-500">
-                            <LogOut className="w-5 h-5" />
-                            <span>Log Out</span>
-                        </button>
                     </Link>
+                    <button
+                        onClick={logoutHandler}
+                        className="flex items-center gap-2 cursor-pointer hover:bg-red-700 py-2 px-6 font-bold text-lg rounded-xl transition-colors duration-200 bg-red-500">
+                        <LogOut className="w-5 h-5" />
+                        <span>Log Out</span>
+                    </button>
                 </div>
             </section>
         </div>
