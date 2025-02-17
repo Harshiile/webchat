@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { MessageSquare, Plus, Users, LogOut, Send, X } from "lucide-react";
+import { MessageSquare, Plus, Users, User, Users2, LogOut, Send, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import RoomsList from "./RoomList";
 import { Link } from "react-router-dom";
+import RoomModal from "./RoomModel";
 
 const Chat = () => {
     const [currentRoom, setCurrentRoom] = useState("General");
@@ -14,6 +15,9 @@ const Chat = () => {
     const [showModal, setShowModal] = useState(false);
     const [modalType, setModalType] = useState(""); // "create" or "join"
     const [roomData, setRoomData] = useState({ name: "", description: "" });
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+
 
     useEffect(() => {
         fetch("http://localhost:3000/api/v0/get/user", { credentials: "include" })
@@ -31,11 +35,11 @@ const Chat = () => {
     const openModal = (type) => {
         setModalType(type);
         setRoomData({ name: "", description: "" });
-        setShowModal(true);
+        setIsModalOpen(true);
     };
 
     const closeModal = () => {
-        setShowModal(false);
+        setIsModalOpen(false);
     };
 
     const handleRoomSubmit = () => {
@@ -73,7 +77,7 @@ const Chat = () => {
             {/* Main Content */}
             <div className="flex flex-1 overflow-hidden">
                 {/* Rooms Sidebar */}
-                <motion.div initial={{ x: -250 }} animate={{ x: showSidebar ? 0 : -250 }} transition={{ type: "spring", stiffness: 300, damping: 30 }} className={`w-64 bg-zinc-900 border-r border-zinc-800 absolute md:relative h-full z-10 ${showSidebar ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}>
+                <motion.div initial={{ x: -250 }} animate={{ x: showSidebar ? 0 : -250 }} transition={{ type: "spring", stiffness: 300, damping: 30 }} className={`w-1/6 bg-zinc-900 border-r border-zinc-800 absolute md:relative h-full z-10 ${showSidebar ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}>
                     <div className="p-4">
                         <div className="space-y-3 mb-6">
                             <button onClick={() => openModal("create")} className="w-full flex items-center justify-center space-x-2 bg-zinc-800 hover:bg-zinc-700 px-4 py-2 rounded-lg transition-colors text-white">
@@ -85,8 +89,11 @@ const Chat = () => {
                                 <span>Join Room</span>
                             </button>
                         </div>
-                        <h2 className="text-lg font-semibold text-gray-300 mb-4">Rooms</h2>
-                        <RoomsList />
+                        <div className="flex items-center mb-4 justify-between px-3">
+                            <h2 className="text-lg font-semibold text-gray-300">Rooms</h2>
+                            <Users2 className="w-4 h-4" />
+                        </div>
+                        <RoomsList setCurrentRoom={setCurrentRoom} />
                     </div>
                 </motion.div>
 
@@ -116,20 +123,11 @@ const Chat = () => {
 
             {/* Modal Dialog for Creating/Joining Room */}
             <AnimatePresence>
-                {showModal && (
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                        <motion.div initial={{ scale: 0.9 }} animate={{ scale: 1 }} exit={{ scale: 0.9 }} className="bg-zinc-900 p-6 rounded-lg shadow-xl w-96">
-                            <div className="flex justify-between items-center mb-4">
-                                <h2 className="text-xl font-bold">{modalType === "create" ? "Create Room" : "Join Room"}</h2>
-                                <button onClick={closeModal} className="text-gray-400 hover:text-white">
-                                    <X className="w-6 h-6" />
-                                </button>
-                            </div>
-                            <input type="text" placeholder="Room Name" className="w-full px-3 py-2 bg-zinc-800 rounded-md mb-2 text-white" />
-                            <input type="text" placeholder="Description (optional)" className="w-full px-3 py-2 bg-zinc-800 rounded-md mb-4 text-white" />
-                            <button onClick={handleRoomSubmit} className="w-full bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-md text-white">Submit</button>
-                        </motion.div>
-                    </motion.div>
+                {isModalOpen && (
+                    <RoomModal
+                        modalType={modalType}
+                        closeModal={closeModal}
+                    />
                 )}
             </AnimatePresence>
         </div>

@@ -100,7 +100,6 @@ const Signup = () => {
     const errorVariants = {
         initial: { opacity: 0, y: -5 },
         animate: { opacity: 1, y: 0 },
-        animate: { opacity: 1, y: 0 },
         exit: { opacity: 0, y: -5 }
     };
 
