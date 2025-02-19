@@ -3,5 +3,6 @@ export interface UserAuth {
     password: string,
     name: string,
     avatar: string,
-    username: string
+    username: string,
+    rooms?: Array<Object>
 }

@@ -7,29 +7,29 @@ import multer from 'multer';
 import { updateUserInDB } from '../controllers/update'
 import { userDataFromAuth } from '../controllers/fetch/userdata'
 import { logoutUser } from '../controllers/logout'
+import { roomController, roomDeleteController } from '../controllers/room'
+import { membersInRooms } from '../controllers/fetch/membersInRoom'
+import { getUsername } from '../middlewares/getUsername'
+import { userUpload } from '../multer/users'
+import { roomUpload } from '../multer/rooms'
+import { getRooms } from '../controllers/fetch/getRooms'
+import { hashController } from '../controllers/encrypt'
 
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'client/public/uploads')
-    },
-    filename: function (req, file, cb) {
-        const ext = path.extname(file.originalname)
-        const fileLength = file.originalname.length;
-        const newFileName = file.originalname.slice(0, fileLength - ext.length);
-        const uniqueSuffix = `${Date.now()}${ext}`
-        cb(null, `${newFileName}_${uniqueSuffix}`)
-    }
-})
-const upload = multer({ storage })
+
 const router = Router()
 
 
 router.post('/get/username', usernameCheck)
 router.get('/get/user', userDataFromAuth)
+router.get('/get/rooms', getRooms)
+router.post('/hash', hashController)
 
-router.post('/update/profile', upload.single('avatar'), updateUserInDB)
+router.post('/update/profile', userUpload.single('avatar'), updateUserInDB)
 router.post('/login', loginController)
-router.post('/signup', upload.single('avatar'), signUpController)
+router.post('/signup', userUpload.single('avatar'), signUpController)
 router.post('/logout', logoutUser)
+router.post('/room/create', roomUpload.single('avatar'), getUsername, roomController)
+router.post('/members-in-rooms', membersInRooms)
+router.post('/room/delete', getUsername, roomDeleteController)
 
 export default router

@@ -1,14 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { MessageSquare, Plus, Users, User, Users2, LogOut, Send, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import RoomsList from "./RoomList";
 import { Link } from "react-router-dom";
-import RoomModal from "./RoomModel";
+import CreateRoom from "./Create";
+import JoinRoom from "./Join";
+import MessageBubble from "./MessageBubble";
 
 const Chat = () => {
-    const [currentRoom, setCurrentRoom] = useState("General");
     const [message, setMessage] = useState("");
+    const [messages, setMessages] = useState([]);
+    const [currentRoom, setCurrentRoom] = useState({ name: "General", avatar: 'rooms/user.png' });
     const [showSidebar, setShowSidebar] = useState(true);
     const [hovered, setHovered] = useState(false);
     const [user, setUser] = useState({ name: "", avatar: "" });
@@ -16,8 +19,16 @@ const Chat = () => {
     const [modalType, setModalType] = useState(""); // "create" or "join"
     const [roomData, setRoomData] = useState({ name: "", description: "" });
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [rooms, setRooms] = useState([])
 
+    const messagesEndRef = useRef(null);
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
 
+    useEffect(() => {
+        scrollToBottom();
+    }, [messages]);
 
     useEffect(() => {
         fetch("http://localhost:3000/api/v0/get/user", { credentials: "include" })
@@ -46,14 +57,23 @@ const Chat = () => {
         toast.success(`${modalType === "create" ? "Room created!" : "Joined room!"}`);
         closeModal();
     };
-
     const handleSubmit = (e) => {
         e.preventDefault();
+
         if (!message.trim()) return;
-        toast.success("Message sent successfully!");
+
+        const newMessage = {
+            id: Date.now().toString(),
+            text: message,
+            sender: "user",
+            timestamp: new Date(),
+            senderName: "Mcintyre",
+            avatarUrl: "/uploads/user.png"
+        };
+
+        setMessages((prev) => [...prev, newMessage]);
         setMessage("");
     };
-
     return (
         <div className="h-screen w-screen text-white flex flex-col bg-black overflow-hidden">
             {/* Navbar */}
@@ -93,21 +113,47 @@ const Chat = () => {
                             <h2 className="text-lg font-semibold text-gray-300">Rooms</h2>
                             <Users2 className="w-4 h-4" />
                         </div>
-                        <RoomsList setCurrentRoom={setCurrentRoom} />
+                        <RoomsList setCurrentRoom={setCurrentRoom} rooms={rooms} setRooms={setRooms} />
                     </div>
                 </motion.div>
 
                 {/* Chat Section */}
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="flex-1 flex flex-col bg-zinc-950">
                     <div className="px-6 py-4 border-b border-zinc-800 flex justify-between items-center bg-zinc-900">
-                        <h3 className="text-lg font-semibold">{currentRoom}</h3>
+                        <div className="flex items-center gap-x-3.5">
+                            <img src={currentRoom.avatar} className="w-10 h-10 rounded-full border border-gray-600 shadow-sm" />
+                            <h3 className="text-lg font-semibold">{currentRoom.name}</h3>
+                        </div>
                         <button onClick={() => toast.info("Leaving room...")} className="flex items-center space-x-2 text-red-400 hover:text-red-300 px-3 py-2 rounded-lg hover:bg-red-400/10 transition-colors">
                             <LogOut className="w-4 h-4" />
                             <span>Leave Room</span>
                         </button>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto p-6 space-y-4">{/* Messages will be added here */}</div>
+                    <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-6">
+                        {/* Messages will be added here */}
+                        <AnimatePresence initial={false}>
+                            {messages.map((msg) => (
+                                <motion.div
+                                    key={msg.id}
+                                    initial={{ x: msg.sender === "user" ? 100 : -100, opacity: 0 }}
+                                    animate={{ x: 0, opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    transition={{ type: "spring", bounce: 0.3, duration: 0.6 }}
+                                    className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
+                                >
+                                    <MessageBubble
+                                        text={msg.text}
+                                        sender={msg.sender}
+                                        timestamp={msg.timestamp}
+                                        senderName={msg.senderName}
+                                        avatarUrl={msg.avatarUrl}
+                                    />
+                                </motion.div>
+                            ))}
+                        </AnimatePresence>
+                        <div ref={messagesEndRef} />
+                    </div>
 
                     <motion.form initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }} onSubmit={handleSubmit} className="px-6 py-4 border-t border-zinc-800 bg-zinc-900">
                         <div className="flex space-x-4">
@@ -124,10 +170,13 @@ const Chat = () => {
             {/* Modal Dialog for Creating/Joining Room */}
             <AnimatePresence>
                 {isModalOpen && (
-                    <RoomModal
-                        modalType={modalType}
-                        closeModal={closeModal}
-                    />
+                    modalType == 'create' ?
+                        <CreateRoom
+                            closeModal={closeModal}
+                            setCurrentRoom={setCurrentRoom}
+                            setRooms={setRooms}
+                        /> :
+                        <JoinRoom closeModal={closeModal} />
                 )}
             </AnimatePresence>
         </div>

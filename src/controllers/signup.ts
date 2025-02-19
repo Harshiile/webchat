@@ -21,9 +21,7 @@ export const signUpController = async (req: Request<{}, {}, UserAuth>, res: Resp
             })
             const loginCookie = cookieGenerator({ username, name, avatar })
             console.log(loginCookie);
-            res.cookie('auth', loginCookie, {
-                httpOnly: true
-            })
+            res.cookie('auth', loginCookie)
             res.json({
                 statusCode: 200,
                 message: 'Signup Successfully',

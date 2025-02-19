@@ -4,7 +4,6 @@ import { updateUser } from '../models/schema'
 import fs from 'fs'
 import path from 'path'
 import { cookieGenerator, cookieValidator } from '../lib/cookie'
-import { UserAuth } from '../types/UserAuth'
 
 interface UpdateUser {
     username: string,

@@ -19,9 +19,7 @@ const loginController = (req, res) => __awaiter(void 0, void 0, void 0, function
         if (user.password == password) {
             const { name, avatar, username } = user;
             const loginCookie = (0, cookie_1.cookieGenerator)({ username, name, avatar });
-            res.cookie('auth', loginCookie, {
-                httpOnly: true
-            });
+            res.cookie('auth', loginCookie);
             res.json({
                 statusCode: 200,
                 message: 'Login Successfully',

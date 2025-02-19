@@ -1,35 +1,29 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const login_1 = require("../controllers/login");
 const signup_1 = require("../controllers/signup");
 const usernameCheck_1 = require("../controllers/usernameCheck");
-const path_1 = __importDefault(require("path"));
-const multer_1 = __importDefault(require("multer"));
 const update_1 = require("../controllers/update");
 const userdata_1 = require("../controllers/fetch/userdata");
 const logout_1 = require("../controllers/logout");
-const storage = multer_1.default.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'client/public/uploads');
-    },
-    filename: function (req, file, cb) {
-        const ext = path_1.default.extname(file.originalname);
-        const fileLength = file.originalname.length;
-        const newFileName = file.originalname.slice(0, fileLength - ext.length);
-        const uniqueSuffix = `${Date.now()}${ext}`;
-        cb(null, `${newFileName}_${uniqueSuffix}`);
-    }
-});
-const upload = (0, multer_1.default)({ storage });
+const room_1 = require("../controllers/room");
+const membersInRoom_1 = require("../controllers/fetch/membersInRoom");
+const getUsername_1 = require("../middlewares/getUsername");
+const users_1 = require("../multer/users");
+const rooms_1 = require("../multer/rooms");
+const getRooms_1 = require("../controllers/fetch/getRooms");
+const encrypt_1 = require("../controllers/encrypt");
 const router = (0, express_1.Router)();
 router.post('/get/username', usernameCheck_1.usernameCheck);
 router.get('/get/user', userdata_1.userDataFromAuth);
-router.post('/update/profile', upload.single('avatar'), update_1.updateUserInDB);
+router.get('/get/rooms', getRooms_1.getRooms);
+router.post('/hash', encrypt_1.hashController);
+router.post('/update/profile', users_1.userUpload.single('avatar'), update_1.updateUserInDB);
 router.post('/login', login_1.loginController);
-router.post('/signup', upload.single('avatar'), signup_1.signUpController);
+router.post('/signup', users_1.userUpload.single('avatar'), signup_1.signUpController);
 router.post('/logout', logout_1.logoutUser);
+router.post('/room/create', rooms_1.roomUpload.single('avatar'), getUsername_1.getUsername, room_1.roomController);
+router.post('/members-in-rooms', membersInRoom_1.membersInRooms);
+router.post('/room/delete', getUsername_1.getUsername, room_1.roomDeleteController);
 exports.default = router;

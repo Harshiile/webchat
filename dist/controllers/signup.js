@@ -27,9 +27,7 @@ const signUpController = (req, res) => __awaiter(void 0, void 0, void 0, functio
             });
             const loginCookie = (0, cookie_1.cookieGenerator)({ username, name, avatar });
             console.log(loginCookie);
-            res.cookie('auth', loginCookie, {
-                httpOnly: true
-            });
+            res.cookie('auth', loginCookie);
             res.json({
                 statusCode: 200,
                 message: 'Signup Successfully',

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateUser = exports.getUserByUsername = exports.getUserByEmail = exports.userAdd = void 0;
+exports.getRoomsFromDB = exports.removeRoomToUser = exports.addRoomToUser = exports.updateUser = exports.getUserByUsername = exports.getUserByEmail = exports.userAdd = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 const userSchema = new mongoose_1.default.Schema({
     email: {
@@ -25,7 +25,8 @@ const userSchema = new mongoose_1.default.Schema({
         unique: true
     },
     avatar: String,
-    name: String
+    name: String,
+    rooms: (Array)
 });
 const userModel = mongoose_1.default.model('users', userSchema);
 const userAdd = ({ email, password, username, name, avatar }) => __awaiter(void 0, void 0, void 0, function* () {
@@ -35,9 +36,9 @@ const userAdd = ({ email, password, username, name, avatar }) => __awaiter(void 
             password,
             username,
             avatar,
-            name
+            name,
+            rooms: []
         });
-        return false;
     }
     catch (error) {
         throw new Error("Database not responding while inserting user data");
@@ -80,3 +81,48 @@ const updateUser = (oldusername, newusername, avatar, name) => __awaiter(void 0,
     }
 });
 exports.updateUser = updateUser;
+const addRoomToUser = (username, room, roomId) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        yield userModel.findOneAndUpdate({ username }, {
+            $push: {
+                rooms: {
+                    room,
+                    roomId
+                }
+            }
+        });
+    }
+    catch (error) {
+        throw new Error("Database not responding while fetching user data");
+    }
+});
+exports.addRoomToUser = addRoomToUser;
+const removeRoomToUser = (username, roomId) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        yield userModel.findOneAndUpdate({ username }, {
+            $pull: {
+                rooms: {
+                    roomId
+                }
+            }
+        });
+    }
+    catch (error) {
+        throw new Error("Database not responding while fetching user data");
+    }
+});
+exports.removeRoomToUser = removeRoomToUser;
+const getRoomsFromDB = (username) => __awaiter(void 0, void 0, void 0, function* () {
+    // -> get rooms data from username from user table
+    return yield userModel.aggregate([
+        {
+            $lookup: {
+                from: 'rooms',
+                localField: 'rooms',
+                foreignField: '*',
+                as: 'roomDetails'
+            }
+        }
+    ]);
+});
+exports.getRoomsFromDB = getRoomsFromDB;

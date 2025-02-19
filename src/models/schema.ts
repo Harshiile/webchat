@@ -12,21 +12,22 @@ const userSchema = new mongoose.Schema<UserAuth>({
         unique: true
     },
     avatar: String,
-    name: String
+    name: String,
+    rooms: Array<Object>
 })
 
 const userModel = mongoose.model<UserAuth>('users', userSchema)
 
-export const userAdd = async ({ email, password, username, name, avatar }: UserAuth): Promise<boolean> => {
+export const userAdd = async ({ email, password, username, name, avatar }: UserAuth) => {
     try {
         await userModel.create({
             email,
             password,
             username,
             avatar,
-            name
+            name,
+            rooms: []
         })
-        return false;
     } catch (error) {
         throw new Error("Database not responding while inserting user data");
     }
@@ -61,4 +62,44 @@ export const updateUser = async (oldusername: string, newusername: string, avata
         throw new Error("Database not responding while updating user data");
     }
 }
+export const addRoomToUser = async (username: string, room: string, roomId: string) => {
+    try {
+        await userModel.findOneAndUpdate({ username }, {
+            $push: {
+                rooms: {
+                    room,
+                    roomId
+                }
+            }
+        })
+    } catch (error) {
+        throw new Error("Database not responding while fetching user data");
+    }
+}
+export const removeRoomToUser = async (username: string, roomId: string) => {
+    try {
+        await userModel.findOneAndUpdate({ username }, {
+            $pull: {
+                rooms: {
+                    roomId
+                }
+            }
+        })
+    } catch (error) {
+        throw new Error("Database not responding while fetching user data");
+    }
+}
 
+export const getRoomsFromDB = async (username: string): Promise<Array<Object>> => {
+    // -> get rooms data from username from user table
+    return await userModel.aggregate([
+        {
+            $lookup: {
+                from: 'rooms',
+                localField: 'rooms',
+                foreignField: '*',
+                as: 'roomDetails'
+            }
+        }
+    ])
+}
