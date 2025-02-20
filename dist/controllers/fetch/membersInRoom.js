@@ -10,13 +10,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.membersInRooms = void 0;
-const room_1 = require("../../models/room");
 const membersInRooms = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.json({
         statusCode: 200,
         message: 'Total members in Rooms',
         data: {
-            totalMembers: yield (0, room_1.totalMembersInRoom)(req.body.roomId)
+            totalMembers: yield totalMembersInRoom(req.body.roomId)
         }
     });
 });

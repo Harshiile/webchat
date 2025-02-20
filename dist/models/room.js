@@ -36,13 +36,14 @@ const addRoom = ({ name, avatar, createBy, isPrivate }, roomCookie) => __awaiter
             members: [createBy]
         });
         // add room to user
-        yield (0, schema_1.addRoomToUser)(createBy, name, room._id.toHexString());
+        yield (0, schema_1.addRoomToUser)(createBy, room._id);
         // change cookie
         const existedRooms = (0, getRoomsFromCookie_1.getRoomsFromCookie)(roomCookie) || [];
         const newRooms = [...existedRooms, {
                 name,
-                _id: room._id,
-                avatar
+                roomId: room._id,
+                avatar,
+                isPrivate
             }];
         return {
             _id: room._id,

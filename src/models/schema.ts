@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema<UserAuth>({
     },
     avatar: String,
     name: String,
-    rooms: Array<Object>
+    rooms: Array<mongoose.Types.ObjectId>
 })
 
 const userModel = mongoose.model<UserAuth>('users', userSchema)
@@ -62,14 +62,11 @@ export const updateUser = async (oldusername: string, newusername: string, avata
         throw new Error("Database not responding while updating user data");
     }
 }
-export const addRoomToUser = async (username: string, room: string, roomId: string) => {
+export const addRoomToUser = async (username: string, roomId: mongoose.Types.ObjectId) => {
     try {
         await userModel.findOneAndUpdate({ username }, {
             $push: {
-                rooms: {
-                    room,
-                    roomId
-                }
+                rooms: roomId
             }
         })
     } catch (error) {
@@ -91,15 +88,32 @@ export const removeRoomToUser = async (username: string, roomId: string) => {
 }
 
 export const getRoomsFromDB = async (username: string): Promise<Array<Object>> => {
-    // -> get rooms data from username from user table
-    return await userModel.aggregate([
-        {
-            $lookup: {
-                from: 'rooms',
-                localField: 'rooms',
-                foreignField: '*',
-                as: 'roomDetails'
+    return await userModel.aggregate(
+        [
+            {
+                $unwind: '$rooms'
+            },
+            {
+                $lookup: {
+                    from: 'rooms',
+                    localField: 'rooms',
+                    foreignField: '_id',
+                    as: 'result'
+                }
+            },
+            {
+                $project: {
+                    roomDetails: { $first: '$result' }
+                }
+            },
+            {
+                $project: {
+                    name: '$roomDetails.name',
+                    avatar: '$roomDetails.avatar',
+                    isPrivate: '$roomDetails.isPrivate',
+                    roomId: '$roomDetails._id'
+                }
             }
-        }
-    ])
+        ]
+    )
 }

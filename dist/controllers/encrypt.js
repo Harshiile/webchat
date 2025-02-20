@@ -8,26 +8,39 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.hashController = void 0;
 const crypto_1 = require("crypto");
-// Define AES-256-CBC algorithm
+const base62_1 = __importDefault(require("base62"));
+const lz_string_1 = __importDefault(require("lz-string"));
+// AES Configuration
 const algorithm = "aes-256-cbc";
-const key = (0, crypto_1.randomBytes)(32); // 256-bit key
-const iv = (0, crypto_1.randomBytes)(16); // Initialization Vector (IV)
-// Encrypt function
+const key = (0, crypto_1.randomBytes)(32); // 256-bit secret key
+const iv = (0, crypto_1.randomBytes)(16); // 16-byte Initialization Vector (IV)
+// 🔒 Encrypt Function
 function encrypt(text) {
+    // Step 1: Compress text
+    const compressed = lz_string_1.default.compress(text);
+    // Step 2: Encrypt with AES-256
     const cipher = (0, crypto_1.createCipheriv)(algorithm, key, iv);
-    let encrypted = cipher.update(text, "utf-8", "hex");
-    encrypted += cipher.final("hex");
-    return { encrypted, iv: iv.toString("hex"), key: key.toString("hex") };
+    let encrypted = cipher.update(compressed, "utf-8", "base64");
+    encrypted += cipher.final("base64");
+    // Step 3: Encode to Base62 for short output
+    return base62_1.default.encode(Buffer.from(encrypted, "base64"));
 }
-// Decrypt function
-function decrypt(encryptedText, ivHex, keyHex) {
-    const decipher = (0, crypto_1.createDecipheriv)(algorithm, Buffer.from(keyHex, "hex"), Buffer.from(ivHex, "hex"));
-    let decrypted = decipher.update(encryptedText, "hex", "utf-8");
+// 🔓 Decrypt Function
+function decrypt(encryptedText) {
+    // Step 1: Decode from Base62
+    const decoded = Buffer.from(base62_1.default.decode(encryptedText)).toString("base64");
+    // Step 2: Decrypt AES-256
+    const decipher = (0, crypto_1.createDecipheriv)(algorithm, key, iv);
+    let decrypted = decipher.update(decoded, "base64", "utf-8");
     decrypted += decipher.final("utf-8");
-    return decrypted;
+    // Step 3: Decompress text
+    return lz_string_1.default.decompress(decrypted);
 }
 const hashController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { message } = req.body;

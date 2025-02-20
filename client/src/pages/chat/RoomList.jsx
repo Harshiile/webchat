@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 
 const RoomsList = ({ setCurrentRoom, rooms, setRooms }) => {
     useEffect(() => {
@@ -7,10 +7,13 @@ const RoomsList = ({ setCurrentRoom, rooms, setRooms }) => {
             .then((res) => res.json())
             .then(({ statusCode, data, message }) => {
                 if (statusCode === 200) {
-                    console.log(message);
-
-                    console.log(data[0].rooms);
-                    setRooms(data[0].rooms);
+                    const rooms = data[0].roomsDetails
+                    setRooms(rooms);
+                    setCurrentRoom({
+                        name: rooms[0].name,
+                        avatar: rooms[0].avatar,
+                        roomId: rooms[0].roomId,
+                    })
                 }
             });
     }, [])
@@ -20,9 +23,9 @@ const RoomsList = ({ setCurrentRoom, rooms, setRooms }) => {
             {rooms.map((room, index) => (
                 <motion.div
                     onClick={() => {
-                        setCurrentRoom({ name: room.name, avatar: room.avatar })
+                        setCurrentRoom({ name: room.name, avatar: room.avatar, roomId: room.roomId })
                     }}
-                    key={room._id}
+                    key={room.roomId}
                     initial={{ x: -20, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ delay: index * 0.1 }}

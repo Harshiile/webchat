@@ -26,16 +26,20 @@ const getRooms = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     else {
         // fetch rooms from user table by username
         const user = (0, cookie_1.cookieValidator)(req.cookies['auth']);
+        let roomsDetails;
         if (typeof (user) != 'string') {
-            const roomsDetails = yield (0, schema_1.getRoomsFromDB)(user.username);
-            res.json({
-                statusCode: 200,
-                message: 'Fetching room from DB successful',
-                data: [
-                    roomsDetails
-                ]
-            });
+            roomsDetails = yield (0, schema_1.getRoomsFromDB)(user.username);
+            res.cookie('rooms', (0, cookie_1.cookieGenerator)({ roomsDetails }));
         }
+        res.json({
+            statusCode: 200,
+            message: 'Fetching room from DB successful',
+            data: [
+                {
+                    roomsDetails
+                }
+            ]
+        });
     }
 });
 exports.getRooms = getRooms;

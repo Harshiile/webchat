@@ -7,11 +7,13 @@ import { Link } from "react-router-dom";
 import CreateRoom from "./Create";
 import JoinRoom from "./Join";
 import MessageBubble from "./MessageBubble";
+import LeaveRoomDialog from "./Leave";
 
 const Chat = () => {
+    const [roomLeavedConfirm, setRoomLeavedConfirm] = useState(false)
     const [message, setMessage] = useState("");
     const [messages, setMessages] = useState([]);
-    const [currentRoom, setCurrentRoom] = useState({ name: "General", avatar: 'rooms/user.png' });
+    const [currentRoom, setCurrentRoom] = useState({});
     const [showSidebar, setShowSidebar] = useState(true);
     const [hovered, setHovered] = useState(false);
     const [user, setUser] = useState({ name: "", avatar: "" });
@@ -20,11 +22,18 @@ const Chat = () => {
     const [roomData, setRoomData] = useState({ name: "", description: "" });
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [rooms, setRooms] = useState([])
+    const [leaveRoomShow, setLeaveRoomShow] = useState(false)
 
     const messagesEndRef = useRef(null);
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
+    useEffect(() => {
+        roomLeavedConfirm && console.log('Room leaved : ', currentRoom)
+        return () => {
+            setRoomLeavedConfirm(false)
+        }
+    }, [roomLeavedConfirm])
 
     useEffect(() => {
         scrollToBottom();
@@ -124,7 +133,7 @@ const Chat = () => {
                             <img src={currentRoom.avatar} className="w-10 h-10 rounded-full border border-gray-600 shadow-sm" />
                             <h3 className="text-lg font-semibold">{currentRoom.name}</h3>
                         </div>
-                        <button onClick={() => toast.info("Leaving room...")} className="flex items-center space-x-2 text-red-400 hover:text-red-300 px-3 py-2 rounded-lg hover:bg-red-400/10 transition-colors">
+                        <button onClick={() => setLeaveRoomShow(true)} className="flex items-center space-x-2 text-red-400 hover:text-red-300 px-3 py-2 rounded-lg hover:bg-red-400/10 transition-colors">
                             <LogOut className="w-4 h-4" />
                             <span>Leave Room</span>
                         </button>
@@ -179,6 +188,10 @@ const Chat = () => {
                         <JoinRoom closeModal={closeModal} />
                 )}
             </AnimatePresence>
+
+            {
+                leaveRoomShow && <LeaveRoomDialog setLeaveRoomShow={setLeaveRoomShow} setRoomLeavedConfirm={setRoomLeavedConfirm} />
+            }
         </div>
     );
 };

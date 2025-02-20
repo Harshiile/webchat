@@ -25,13 +25,14 @@ export const addRoom = async ({ name, avatar, createBy, isPrivate }: Rooms, room
             members: [createBy]
         })
         // add room to user
-        await addRoomToUser(createBy, name, room._id.toHexString())
+        await addRoomToUser(createBy, room._id)
         // change cookie
         const existedRooms = getRoomsFromCookie(roomCookie) || []
         const newRooms = [...existedRooms, {
             name,
-            _id: room._id,
-            avatar
+            roomId: room._id,
+            avatar,
+            isPrivate
         }]
         return {
             _id: room._id,

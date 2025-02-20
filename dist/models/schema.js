@@ -81,14 +81,11 @@ const updateUser = (oldusername, newusername, avatar, name) => __awaiter(void 0,
     }
 });
 exports.updateUser = updateUser;
-const addRoomToUser = (username, room, roomId) => __awaiter(void 0, void 0, void 0, function* () {
+const addRoomToUser = (username, roomId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield userModel.findOneAndUpdate({ username }, {
             $push: {
-                rooms: {
-                    room,
-                    roomId
-                }
+                rooms: roomId
             }
         });
     }
@@ -113,14 +110,29 @@ const removeRoomToUser = (username, roomId) => __awaiter(void 0, void 0, void 0,
 });
 exports.removeRoomToUser = removeRoomToUser;
 const getRoomsFromDB = (username) => __awaiter(void 0, void 0, void 0, function* () {
-    // -> get rooms data from username from user table
     return yield userModel.aggregate([
+        {
+            $unwind: '$rooms'
+        },
         {
             $lookup: {
                 from: 'rooms',
                 localField: 'rooms',
-                foreignField: '*',
-                as: 'roomDetails'
+                foreignField: '_id',
+                as: 'result'
+            }
+        },
+        {
+            $project: {
+                roomDetails: { $first: '$result' }
+            }
+        },
+        {
+            $project: {
+                name: '$roomDetails.name',
+                avatar: '$roomDetails.avatar',
+                isPrivate: '$roomDetails.isPrivate',
+                roomId: '$roomDetails._id'
             }
         }
     ]);
