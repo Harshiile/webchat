@@ -32,7 +32,8 @@ export const addRoom = async ({ name, avatar, createBy, isPrivate }: Rooms, room
             name,
             roomId: room._id,
             avatar,
-            isPrivate
+            isPrivate,
+            totalMembers: room.members?.length
         }]
         return {
             _id: room._id,
@@ -46,7 +47,7 @@ export const addRoom = async ({ name, avatar, createBy, isPrivate }: Rooms, room
 }
 
 
-export const roomDelete = async (username: string, roomId: string, roomCookie: string) => {
+export const roomDelete = async (username: string, roomId: mongoose.Types.ObjectId, roomCookie: string) => {
     try {
         await roomModel.findByIdAndUpdate(roomId, {
             $pull: {
@@ -59,9 +60,7 @@ export const roomDelete = async (username: string, roomId: string, roomCookie: s
         // change cookie
         const existedRooms = getRoomsFromCookie(roomCookie) || []
         const newRooms = existedRooms.filter(room => room.roomId != roomId)
-        console.log(newRooms);
-
-        return cookieGenerator({ rooms: newRooms })
+        return { newRooms, roomsToken: cookieGenerator({ rooms: newRooms }) }
     } catch (error) {
         console.log('Error : ', error);
         throw new Error("Database not responding while inserting room");

@@ -2,6 +2,8 @@ import { Request, Response } from 'express'
 import { APIResponse } from '../types/APIResponse'
 import { addRoom, roomDelete } from '../models/room';
 import { Rooms } from '../types/Rooms';
+import mongoose from 'mongoose';
+import { APIRooms } from '../types/APIRooms';
 
 export const roomController = async (req: Request<{}, {}, Rooms & { username: string }>, res: Response<APIResponse>) => {
     const { name, isPrivate, username } = req.body;
@@ -10,16 +12,18 @@ export const roomController = async (req: Request<{}, {}, Rooms & { username: st
         if (!username) throw new Error("Server Error");
         const { cookie, _id, totalMembers } = await addRoom({ name, avatar, createBy: username, isPrivate }, req.cookies['rooms'])
         res.cookie('rooms', cookie)
+        const returnedRoom: APIRooms = {
+            name,
+            avatar: `/rooms/${avatar}`,
+            roomId: _id,
+            isPrivate,
+            totalMembers
+        }
         res.json({
             statusCode: 200,
             message: 'Room Created Successfully',
             data: [
-                {
-                    name,
-                    avatar: `/rooms/${avatar}`,
-                    _id,
-                    totalMembers
-                }
+                returnedRoom
             ]
         })
     } catch (error) {
@@ -30,14 +34,17 @@ export const roomController = async (req: Request<{}, {}, Rooms & { username: st
         })
     }
 }
-export const roomDeleteController = async (req: Request<{}, {}, { roomId: string, username: string }>, res: Response<APIResponse>) => {
-    const { roomId, username } = req.body;
+export const roomDeleteController = async (req: Request<{}, {}, { roomId: mongoose.Types.ObjectId, username: string }>, res: Response<APIResponse>) => {
+    const { username, roomId } = req.body;
     try {
-        const roomsToken = await roomDelete(username, roomId, req.cookies['rooms'])
+        const { roomsToken, newRooms } = await roomDelete(username, roomId, req.cookies['rooms'])
         res.cookie('rooms', roomsToken)
         res.json({
             statusCode: 200,
-            message: 'Room Deleted Successfully'
+            message: 'Room Deleted Successfully',
+            data: [
+                newRooms
+            ]
         })
     } catch (error) {
         console.log('Error at roomController : ', error);

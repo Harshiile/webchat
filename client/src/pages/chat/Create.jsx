@@ -33,8 +33,8 @@ const CreateRoom = ({ closeModal, setCurrentRoom, setRooms }) => {
         }).then(res => res.json()).then(({ statusCode, message, data }) => {
             if (statusCode == 200) {
                 closeModal()
-                console.log(data[0]);
                 setRooms((rooms) => [...rooms, data[0]])
+                setCurrentRoom(data[0])
             }
         })
     };

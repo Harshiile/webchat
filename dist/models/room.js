@@ -26,6 +26,7 @@ const roomSchema = new mongoose_1.default.Schema({
 });
 const roomModel = mongoose_1.default.model('rooms', roomSchema);
 const addRoom = ({ name, avatar, createBy, isPrivate }, roomCookie) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     try {
         avatar = `/rooms/${avatar}`;
         const room = yield roomModel.create({
@@ -43,7 +44,8 @@ const addRoom = ({ name, avatar, createBy, isPrivate }, roomCookie) => __awaiter
                 name,
                 roomId: room._id,
                 avatar,
-                isPrivate
+                isPrivate,
+                totalMembers: (_a = room.members) === null || _a === void 0 ? void 0 : _a.length
             }];
         return {
             _id: room._id,
@@ -69,8 +71,7 @@ const roomDelete = (username, roomId, roomCookie) => __awaiter(void 0, void 0, v
         // change cookie
         const existedRooms = (0, getRoomsFromCookie_1.getRoomsFromCookie)(roomCookie) || [];
         const newRooms = existedRooms.filter(room => room.roomId != roomId);
-        console.log(newRooms);
-        return (0, cookie_1.cookieGenerator)({ rooms: newRooms });
+        return { newRooms, roomsToken: (0, cookie_1.cookieGenerator)({ rooms: newRooms }) };
     }
     catch (error) {
         console.log('Error : ', error);

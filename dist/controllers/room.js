@@ -19,16 +19,18 @@ const roomController = (req, res) => __awaiter(void 0, void 0, void 0, function*
             throw new Error("Server Error");
         const { cookie, _id, totalMembers } = yield (0, room_1.addRoom)({ name, avatar, createBy: username, isPrivate }, req.cookies['rooms']);
         res.cookie('rooms', cookie);
+        const returnedRoom = {
+            name,
+            avatar: `/rooms/${avatar}`,
+            roomId: _id,
+            isPrivate,
+            totalMembers
+        };
         res.json({
             statusCode: 200,
             message: 'Room Created Successfully',
             data: [
-                {
-                    name,
-                    avatar: `/rooms/${avatar}`,
-                    _id,
-                    totalMembers
-                }
+                returnedRoom
             ]
         });
     }
@@ -42,13 +44,16 @@ const roomController = (req, res) => __awaiter(void 0, void 0, void 0, function*
 });
 exports.roomController = roomController;
 const roomDeleteController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { roomId, username } = req.body;
+    const { username, roomId } = req.body;
     try {
-        const roomsToken = yield (0, room_1.roomDelete)(username, roomId, req.cookies['rooms']);
+        const { roomsToken, newRooms } = yield (0, room_1.roomDelete)(username, roomId, req.cookies['rooms']);
         res.cookie('rooms', roomsToken);
         res.json({
             statusCode: 200,
-            message: 'Room Deleted Successfully'
+            message: 'Room Deleted Successfully',
+            data: [
+                newRooms
+            ]
         });
     }
     catch (error) {

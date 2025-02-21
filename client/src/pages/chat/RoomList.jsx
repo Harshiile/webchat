@@ -7,20 +7,16 @@ const RoomsList = ({ setCurrentRoom, rooms, setRooms }) => {
             .then((res) => res.json())
             .then(({ statusCode, data, message }) => {
                 if (statusCode === 200) {
-                    const rooms = data[0].roomsDetails
-                    setRooms(rooms);
-                    setCurrentRoom({
-                        name: rooms[0].name,
-                        avatar: rooms[0].avatar,
-                        roomId: rooms[0].roomId,
-                    })
+                    const rooms = data[0].rooms
+                    setRooms(rooms)
+                    setCurrentRoom(rooms[0])
                 }
             });
     }, [])
 
     return (
         <div className="space-y-2">
-            {rooms.map((room, index) => (
+            {rooms && rooms.map((room, index) => (
                 <motion.div
                     onClick={() => {
                         setCurrentRoom({ name: room.name, avatar: room.avatar, roomId: room.roomId })

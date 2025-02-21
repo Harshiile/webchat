@@ -17,17 +17,20 @@ export const getRooms = async (req: Request, res: Response<APIResponse>) => {
     else {
         // fetch rooms from user table by username
         const user = cookieValidator(req.cookies['auth'])
-        let roomsDetails;
+        let roomDetails;
         if (typeof (user) != 'string') {
-            roomsDetails = await getRoomsFromDB(user.username)
-            res.cookie('rooms', cookieGenerator({ roomsDetails }))
+            roomDetails = await getRoomsFromDB(user.username)
+            console.log(roomDetails);
+
+            res.cookie('rooms', cookieGenerator({ rooms: roomDetails }))
         }
         res.json({
             statusCode: 200,
             message: 'Fetching room from DB successful',
+
             data: [
                 {
-                    roomsDetails
+                    rooms: roomDetails
                 }
             ]
         })

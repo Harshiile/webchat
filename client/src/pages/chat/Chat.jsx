@@ -13,13 +13,11 @@ const Chat = () => {
     const [roomLeavedConfirm, setRoomLeavedConfirm] = useState(false)
     const [message, setMessage] = useState("");
     const [messages, setMessages] = useState([]);
-    const [currentRoom, setCurrentRoom] = useState({});
+    const [currentRoom, setCurrentRoom] = useState({ name: 'WebChat', avatar: '/uploads/user.png' });
     const [showSidebar, setShowSidebar] = useState(true);
     const [hovered, setHovered] = useState(false);
-    const [user, setUser] = useState({ name: "", avatar: "" });
-    const [showModal, setShowModal] = useState(false);
+    const [user, setUser] = useState({ name: '', avatar: '', username: '' })
     const [modalType, setModalType] = useState(""); // "create" or "join"
-    const [roomData, setRoomData] = useState({ name: "", description: "" });
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [rooms, setRooms] = useState([])
     const [leaveRoomShow, setLeaveRoomShow] = useState(false)
@@ -47,6 +45,7 @@ const Chat = () => {
                     setUser({
                         name: data.user.name,
                         avatar: `/uploads/${data.user.avatar}`,
+                        username: data.user.username
                     });
                 }
             });
@@ -54,7 +53,6 @@ const Chat = () => {
 
     const openModal = (type) => {
         setModalType(type);
-        setRoomData({ name: "", description: "" });
         setIsModalOpen(true);
     };
 
@@ -190,7 +188,15 @@ const Chat = () => {
             </AnimatePresence>
 
             {
-                leaveRoomShow && <LeaveRoomDialog setLeaveRoomShow={setLeaveRoomShow} setRoomLeavedConfirm={setRoomLeavedConfirm} />
+                leaveRoomShow && <LeaveRoomDialog
+                    setLeaveRoomShow={setLeaveRoomShow}
+                    setRoomLeavedConfirm={setRoomLeavedConfirm}
+                    user={user}
+                    currentRoom={currentRoom}
+                    setRooms={setRooms}
+                    rooms={rooms}
+                    setCurrentRoom={setCurrentRoom}
+                />
             }
         </div>
     );

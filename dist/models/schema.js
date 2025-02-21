@@ -98,9 +98,7 @@ const removeRoomToUser = (username, roomId) => __awaiter(void 0, void 0, void 0,
     try {
         yield userModel.findOneAndUpdate({ username }, {
             $pull: {
-                rooms: {
-                    roomId
-                }
+                rooms: new mongoose_1.default.Types.ObjectId(roomId)
             }
         });
     }
@@ -124,16 +122,19 @@ const getRoomsFromDB = (username) => __awaiter(void 0, void 0, void 0, function*
         },
         {
             $project: {
-                roomDetails: { $first: '$result' }
+                rooms: { $first: '$result' }
             }
         },
         {
             $project: {
-                name: '$roomDetails.name',
-                avatar: '$roomDetails.avatar',
-                isPrivate: '$roomDetails.isPrivate',
-                roomId: '$roomDetails._id'
+                name: '$rooms.name',
+                avatar: '$rooms.avatar',
+                isPrivate: '$rooms.isPrivate',
+                roomId: '$rooms._id',
+                totalMembers: { $size: '$rooms.members' }
             }
+        }, {
+            $unset: '_id'
         }
     ]);
 });

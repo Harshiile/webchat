@@ -73,13 +73,11 @@ export const addRoomToUser = async (username: string, roomId: mongoose.Types.Obj
         throw new Error("Database not responding while fetching user data");
     }
 }
-export const removeRoomToUser = async (username: string, roomId: string) => {
+export const removeRoomToUser = async (username: string, roomId: mongoose.Types.ObjectId) => {
     try {
         await userModel.findOneAndUpdate({ username }, {
             $pull: {
-                rooms: {
-                    roomId
-                }
+                rooms: new mongoose.Types.ObjectId(roomId)
             }
         })
     } catch (error) {
@@ -103,16 +101,19 @@ export const getRoomsFromDB = async (username: string): Promise<Array<Object>> =
             },
             {
                 $project: {
-                    roomDetails: { $first: '$result' }
+                    rooms: { $first: '$result' }
                 }
             },
             {
                 $project: {
-                    name: '$roomDetails.name',
-                    avatar: '$roomDetails.avatar',
-                    isPrivate: '$roomDetails.isPrivate',
-                    roomId: '$roomDetails._id'
+                    name: '$rooms.name',
+                    avatar: '$rooms.avatar',
+                    isPrivate: '$rooms.isPrivate',
+                    roomId: '$rooms._id',
+                    totalMembers: { $size: '$rooms.members' }
                 }
+            }, {
+                $unset: '_id'
             }
         ]
     )

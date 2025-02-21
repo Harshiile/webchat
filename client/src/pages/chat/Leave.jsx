@@ -1,7 +1,8 @@
 import { motion, AnimatePresence } from "framer-motion";
+import { Navigate } from "react-router-dom";
 
 
-const LeaveRoomDialog = ({ setLeaveRoomShow, setRoomLeavedConfirm }) => {
+const LeaveRoomDialog = ({ setLeaveRoomShow, setRoomLeavedConfirm, user, rooms, currentRoom, setRooms, setCurrentRoom }) => {
     if (!open) return null;
 
     return (
@@ -38,6 +39,23 @@ const LeaveRoomDialog = ({ setLeaveRoomShow, setRoomLeavedConfirm }) => {
                                 </button>
                                 <button
                                     onClick={() => {
+                                        fetch("http://localhost:3000/api/v0/room/delete",
+                                            {
+                                                credentials: "include",
+                                                method: 'POST',
+                                                headers: {
+                                                    'Content-Type': 'application/json'
+                                                },
+                                                body: JSON.stringify({ username: user.username, roomId: currentRoom.roomId })
+                                            }
+                                        )
+                                            .then((res) => res.json())
+                                            .then(({ statusCode, data, message }) => {
+                                                if (statusCode === 200) {
+                                                    setRooms(data[0])
+                                                    setCurrentRoom(data[0][0])
+                                                }
+                                            });
                                         setLeaveRoomShow(false)
                                         setRoomLeavedConfirm(true)
                                     }}
@@ -49,8 +67,9 @@ const LeaveRoomDialog = ({ setLeaveRoomShow, setRoomLeavedConfirm }) => {
                         </div>
                     </motion.div>
                 </>
-            )}
-        </AnimatePresence>
+            )
+            }
+        </AnimatePresence >
     );
 };
 

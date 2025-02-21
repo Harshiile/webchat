@@ -4,6 +4,7 @@ import { BellRing, MessageCircle, LogOut, Edit2, X, Check, User } from "lucide-r
 import { toast } from "sonner";
 import ToastProvider from '../../components/ToastProvider'
 import EditProfileDialog from "../../components/EditProfileDialog";
+import { useRooms } from "../../context/rooms";
 
 const Profile = () => {
     const [user, setUser] = useState({
@@ -12,7 +13,22 @@ const Profile = () => {
         username: ""
     });
 
+
+    // USE Context API for rooms & currentRoom
+    const [rooms, setRooms] = useState([])
+    // useEffect(() => {
+    //     fetch("http://localhost:3000/api/v0/get/rooms", { credentials: "include" })
+    //         .then((res) => res.json())
+    //         .then(({ statusCode, data, message }) => {
+    //             if (statusCode === 200) {
+    //                 const rooms = data[0].rooms
+    //                 setRooms(rooms)
+    //             }
+    //         });
+    // }, [])
     useEffect(() => {
+        const x = useRooms()
+        console.log('From context api rooms : ', x);
         fetch('http://localhost:3000/api/v0/get/user', {
             credentials: "include"
         })
@@ -38,14 +54,6 @@ const Profile = () => {
 
     const [showNotifications, setShowNotifications] = useState(false);
     const [showEditDialog, setShowEditDialog] = useState(false);
-
-    // Dummy rooms list (Replace with real data from backend)
-    const [rooms, setRooms] = useState([
-        { name: "General", members: 156 },
-        { name: "Gaming", members: 89 },
-        { name: "Coding", members: 234 },
-        { name: "Music", members: 67 }
-    ]);
 
     const handleFriendRequest = (id, accept) => {
         setNotifications(prev => prev.filter(n => n.id !== id));
@@ -191,7 +199,7 @@ const Profile = () => {
                         {rooms.map((room, index) => (
                             <Link
                                 key={index}
-                                to={`/chat/${room.name}`}
+                                to={`/chat`}
                                 className="group relative"
                             >
                                 <div className="bg-zinc-800/50 hover:bg-zinc-700/50 transition-all duration-200 rounded-xl p-4 flex items-center justify-between border border-zinc-700/50">
@@ -199,8 +207,11 @@ const Profile = () => {
                                         <span className="font-bold text-xl capitalize">{room.name}</span>
                                         <div className="flex items-center gap-1 text-zinc-400 text-sm mt-1">
                                             <User className="w-4 h-4" />
-                                            <span>{room.members.toLocaleString()} members</span>
+                                            <span>{room.totalMembers} members</span>
                                         </div>
+                                    </div>
+                                    <div>
+                                        <img className='rounded-full w-14 h-14' src={room.avatar} />
                                     </div>
                                 </div>
                             </Link>
