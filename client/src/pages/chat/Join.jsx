@@ -35,7 +35,7 @@ const JoinRoom = ({ closeModal }) => {
                 console.log(data[0]);
                 setRooms(rooms => [...rooms, data[0]])
                 setCurrentRoom(data[0])
-                // socket.emit('room-join', { roomId })
+                socket.emit('room-join', { roomId })
             }
         })
     };

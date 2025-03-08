@@ -41,7 +41,8 @@ io.on('connection', (socket) => {
     console.log('a user connected : ', socket.id);
     socket.on('msg-sent', ({ msg, room }) => __awaiter(void 0, void 0, void 0, function* () {
         // const roomId=members.get(roomId)
-        // io.to(room).emit('msg-receive', { msg })
+        console.log(io.sockets.adapter.rooms);
+        io.to(room).emit('msg-receive', { msg });
     }));
     socket.on('room-create', ({ roomId }) => {
         socket.join(roomId);

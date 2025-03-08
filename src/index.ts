@@ -33,9 +33,9 @@ io.on('connection', (socket) => {
     console.log('a user connected : ', socket.id);
 
     socket.on('msg-sent', async ({ msg, room }) => {
-
         // const roomId=members.get(roomId)
-        // io.to(room).emit('msg-receive', { msg })
+        console.log(io.sockets.adapter.rooms);
+        io.to(room).emit('msg-receive', { msg })
     })
     socket.on('room-create', ({ roomId }) => {
         socket.join(roomId);

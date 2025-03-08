@@ -94,6 +94,7 @@ const Chat = () => {
             sender: "user",
             timestamp: new Date(),
             senderName: "Mcintyre",
+            roomName: currentRoom.name,
             avatarUrl: "/uploads/user.png"
         };
 
@@ -101,8 +102,12 @@ const Chat = () => {
         setMessage("");
 
         // Emit message in room
-        // isSocketConnected && socket.emit('msg-sent', { msg: newMessage, roomId????? })
+        if (isSocketConnected) {
+            socket.emit('msg-sent', { msg: newMessage, room: currentRoom.roomId })
+            socket.on('msg-receive', msg => {
 
+            })
+        }
     };
     return (
         <div className="h-screen w-screen text-white flex flex-col bg-black overflow-hidden">
