@@ -1,6 +1,3 @@
-import { motion } from "framer-motion";
-
-
 const MessageBubble = ({ text, sender, senderName, timestamp, avatarUrl }) => {
     return (
         <div className={`flex items-center gap-3 max-w-[75%] ${sender === "user" ? "self-end flex-row-reverse" : "self-start flex-row"}`}>

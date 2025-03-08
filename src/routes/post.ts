@@ -5,7 +5,7 @@ import { usernameCheck } from '../controllers/usernameCheck'
 import { updateUserInDB } from '../controllers/update'
 import { userDataFromAuth } from '../controllers/fetch/userdata'
 import { logoutUser } from '../controllers/logout'
-import { roomController, roomDeleteController } from '../controllers/room'
+import { roomController, roomDeleteController, roomJoinController } from '../controllers/room'
 import { getUsername } from '../middlewares/getUsername'
 import { userUpload } from '../multer/users'
 import { roomUpload } from '../multer/rooms'
@@ -24,6 +24,7 @@ router.post('/login', loginController)
 router.post('/signup', userUpload.single('avatar'), signUpController)
 router.post('/logout', logoutUser)
 router.post('/room/create', roomUpload.single('avatar'), getUsername, roomController)
+router.post('/room/join', getUsername, roomJoinController)
 router.post('/room/delete', getUsername, roomDeleteController)
 
 export default router

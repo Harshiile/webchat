@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import ToastProvider from '../../components/ToastProvider'
 import EditProfileDialog from "../../components/EditProfileDialog";
 import { useRooms } from "../../context/rooms";
+import { useCurrentRoom } from "../../context/currentRoom";
 
 const Profile = () => {
     const [user, setUser] = useState({
@@ -12,23 +13,9 @@ const Profile = () => {
         name: "",
         username: ""
     });
-
-
-    // USE Context API for rooms & currentRoom
-    const [rooms, setRooms] = useState([])
-    // useEffect(() => {
-    //     fetch("http://localhost:3000/api/v0/get/rooms", { credentials: "include" })
-    //         .then((res) => res.json())
-    //         .then(({ statusCode, data, message }) => {
-    //             if (statusCode === 200) {
-    //                 const rooms = data[0].rooms
-    //                 setRooms(rooms)
-    //             }
-    //         });
-    // }, [])
+    const [rooms, setRooms] = useRooms()
+    const [currentRoom, setCurrentRoom] = useCurrentRoom()
     useEffect(() => {
-        const x = useRooms()
-        console.log('From context api rooms : ', x);
         fetch('http://localhost:3000/api/v0/get/user', {
             credentials: "include"
         })
@@ -197,9 +184,18 @@ const Profile = () => {
                     <h2 className="font-bold text-2xl md:text-3xl mb-6">Live Rooms</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[calc(100%-3rem)] overflow-y-auto p-2">
                         {rooms.map((room, index) => (
-                            <Link
+                            <div
                                 key={index}
-                                to={`/chat`}
+                                onClick={() => {
+                                    setCurrentRoom({
+                                        name: room.name,
+                                        avatar: room.avatar,
+                                        totalMembers: room.totalMembers,
+                                        isPrivate: room.isPrivate,
+                                        roomId: room.roomId
+                                    })
+                                    window.location.href = `/chat`
+                                }}
                                 className="group relative"
                             >
                                 <div className="bg-zinc-800/50 hover:bg-zinc-700/50 transition-all duration-200 rounded-xl p-4 flex items-center justify-between border border-zinc-700/50">
@@ -214,7 +210,7 @@ const Profile = () => {
                                         <img className='rounded-full w-14 h-14' src={room.avatar} />
                                     </div>
                                 </div>
-                            </Link>
+                            </div>
                         ))}
                     </div>
                 </div>

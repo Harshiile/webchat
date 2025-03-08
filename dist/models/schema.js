@@ -110,32 +110,38 @@ exports.removeRoomToUser = removeRoomToUser;
 const getRoomsFromDB = (username) => __awaiter(void 0, void 0, void 0, function* () {
     return yield userModel.aggregate([
         {
-            $unwind: '$rooms'
+            $match: {
+                username,
+            },
+        },
+        {
+            $unwind: "$rooms",
         },
         {
             $lookup: {
-                from: 'rooms',
-                localField: 'rooms',
-                foreignField: '_id',
-                as: 'result'
-            }
+                from: "rooms",
+                localField: "rooms",
+                foreignField: "_id",
+                as: "result",
+            },
         },
         {
             $project: {
-                rooms: { $first: '$result' }
-            }
+                rooms: { $first: "$result" },
+            },
         },
         {
             $project: {
-                name: '$rooms.name',
-                avatar: '$rooms.avatar',
-                isPrivate: '$rooms.isPrivate',
-                roomId: '$rooms._id',
-                totalMembers: { $size: '$rooms.members' }
-            }
-        }, {
-            $unset: '_id'
-        }
+                name: "$rooms.name",
+                avatar: "$rooms.avatar",
+                isPrivate: "$rooms.isPrivate",
+                roomId: "$rooms._id",
+                totalMembers: { $size: "$rooms.members" },
+            },
+        },
+        {
+            $unset: "_id",
+        },
     ]);
 });
 exports.getRoomsFromDB = getRoomsFromDB;

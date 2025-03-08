@@ -66,3 +66,61 @@ export const roomDelete = async (username: string, roomId: mongoose.Types.Object
         throw new Error("Database not responding while inserting room");
     }
 }
+
+
+export const roomJoin = async (username: string, roomId: mongoose.Types.ObjectId, roomCookie: string) => {
+
+    // 1. Check whether room is exist or not
+    try {
+        const roomExist = await roomModel.findById(roomId);
+        if (roomExist) {
+            try {
+                await roomModel.findByIdAndUpdate(roomId, {
+                    $push: {
+                        members: username
+                    }
+                })
+
+                // change cookie
+                const existedRooms = getRoomsFromCookie(roomCookie) || []
+                const newRoom = {
+                    name: roomExist.name,
+                    avatar: roomExist.avatar,
+                    roomId: roomExist._id.toString(),
+                    isPrivate: roomExist.isPrivate,
+                    totalMembers: roomExist.members?.length || 0 + 1
+                }
+                const newRooms = [...existedRooms, newRoom]
+                return { newRoom, roomsToken: cookieGenerator({ rooms: newRooms }) }
+            } catch (error) {
+                console.log('Error : ', error);
+                throw new Error("Database not responding while joining room");
+            }
+        }
+        return {
+            // Room not exist
+            error: true,
+            message: 'Room not exist'
+        }
+    } catch (error) {
+        console.log('Error : ', error);
+        throw new Error("Database not responding while fetching existing room");
+    }
+
+    try {
+        await roomModel.findByIdAndUpdate(roomId, {
+            $push: {
+                members: username
+            }
+        })
+
+        // change cookie
+        const existedRooms = getRoomsFromCookie(roomCookie) || []
+        const newRooms = existedRooms.filter(room => room.roomId != roomId)
+
+        return { newRooms, roomsToken: cookieGenerator({ rooms: newRooms }) }
+    } catch (error) {
+        console.log('Error : ', error);
+        throw new Error("Database not responding while inserting room");
+    }
+}

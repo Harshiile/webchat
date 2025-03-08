@@ -1,9 +1,10 @@
 import { Request, Response } from 'express'
 import { APIResponse } from '../types/APIResponse'
-import { addRoom, roomDelete } from '../models/room';
+import { addRoom, roomDelete, roomJoin } from '../models/room';
 import { Rooms } from '../types/Rooms';
 import mongoose from 'mongoose';
 import { APIRooms } from '../types/APIRooms';
+import { addRoomToUser } from '../models/schema';
 
 export const roomController = async (req: Request<{}, {}, Rooms & { username: string }>, res: Response<APIResponse>) => {
     const { name, isPrivate, username } = req.body;
@@ -53,4 +54,22 @@ export const roomDeleteController = async (req: Request<{}, {}, { roomId: mongoo
             message: 'Server Error'
         })
     }
+}
+export const roomJoinController = async (req: Request<{}, {}, { roomId: mongoose.Types.ObjectId, username: string }>, res: Response<APIResponse>) => {
+
+    const { username } = req.body;
+    let { roomId } = req.body;
+    roomId = new mongoose.Types.ObjectId(roomId);
+    //add roomId to userModel
+    addRoomToUser(username, roomId);
+    // add userId to members array in roomModel
+    const { roomsToken, newRoom } = await roomJoin(username, roomId, req.cookies['rooms'])
+    res.cookie('rooms', roomsToken)
+    res.json({
+        statusCode: 200,
+        message: 'Room Joined Successfully',
+        data: [
+            newRoom
+        ]
+    })
 }

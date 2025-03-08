@@ -21,5 +21,6 @@ router.post('/login', login_1.loginController);
 router.post('/signup', users_1.userUpload.single('avatar'), signup_1.signUpController);
 router.post('/logout', logout_1.logoutUser);
 router.post('/room/create', rooms_1.roomUpload.single('avatar'), getUsername_1.getUsername, room_1.roomController);
+router.post('/room/join', getUsername_1.getUsername, room_1.roomJoinController);
 router.post('/room/delete', getUsername_1.getUsername, room_1.roomDeleteController);
 exports.default = router;

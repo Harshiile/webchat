@@ -3,9 +3,14 @@ import { ArrowRight, Globe2, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import Modal from "./Model";
+import { useCurrentRoom } from "../../context/currentRoom";
+import { useRooms } from "../../context/rooms";
+import { socket } from "../../socket";
 
-const CreateRoom = ({ closeModal, setCurrentRoom, setRooms }) => {
+const CreateRoom = ({ closeModal }) => {
     const [name, setName] = useState("");
+    const [, setCurrentRoom] = useCurrentRoom()
+    const [, setRooms] = useRooms()
     const [roomType, setRoomType] = useState("public");
     const [roomLogo, setRoomLogo] = useState("/uploads/user.png");
     const handleRoomSubmit = (e) => {
@@ -35,6 +40,7 @@ const CreateRoom = ({ closeModal, setCurrentRoom, setRooms }) => {
                 closeModal()
                 setRooms((rooms) => [...rooms, data[0]])
                 setCurrentRoom(data[0])
+                socket.emit('room-create', { roomId: data[0].roomId })
             }
         })
     };

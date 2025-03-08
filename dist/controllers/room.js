@@ -8,9 +8,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.roomDeleteController = exports.roomController = void 0;
+exports.roomJoinController = exports.roomDeleteController = exports.roomController = void 0;
 const room_1 = require("../models/room");
+const mongoose_1 = __importDefault(require("mongoose"));
+const schema_1 = require("../models/schema");
 const roomController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { name, isPrivate, username } = req.body;
     const avatar = req.file ? req.file.filename : 'user.png';
@@ -65,3 +70,21 @@ const roomDeleteController = (req, res) => __awaiter(void 0, void 0, void 0, fun
     }
 });
 exports.roomDeleteController = roomDeleteController;
+const roomJoinController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { username } = req.body;
+    let { roomId } = req.body;
+    roomId = new mongoose_1.default.Types.ObjectId(roomId);
+    //add roomId to userModel
+    (0, schema_1.addRoomToUser)(username, roomId);
+    // add userId to members array in roomModel
+    const { roomsToken, newRoom } = yield (0, room_1.roomJoin)(username, roomId, req.cookies['rooms']);
+    res.cookie('rooms', roomsToken);
+    res.json({
+        statusCode: 200,
+        message: 'Room Joined Successfully',
+        data: [
+            newRoom
+        ]
+    });
+});
+exports.roomJoinController = roomJoinController;

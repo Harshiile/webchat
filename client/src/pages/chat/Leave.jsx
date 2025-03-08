@@ -1,10 +1,12 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Navigate } from "react-router-dom";
+import { useCurrentRoom } from "../../context/currentRoom";
+import { useRooms } from "../../context/rooms";
 
-
-const LeaveRoomDialog = ({ setLeaveRoomShow, setRoomLeavedConfirm, user, rooms, currentRoom, setRooms, setCurrentRoom }) => {
+const LeaveRoomDialog = ({ setLeaveRoomShow, setRoomLeavedConfirm, user }) => {
     if (!open) return null;
-
+    const [currentRoom, setCurrentRoom] = useCurrentRoom()
+    const [, setRooms] = useRooms()
     return (
         <AnimatePresence>
             {open && (

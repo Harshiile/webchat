@@ -8,24 +8,43 @@ import CreateRoom from "./Create";
 import JoinRoom from "./Join";
 import MessageBubble from "./MessageBubble";
 import LeaveRoomDialog from "./Leave";
+import { useRooms } from "../../context/rooms";
+import { useCurrentRoom } from "../../context/currentRoom";
+import { socket } from '../../socket'
 
 const Chat = () => {
     const [roomLeavedConfirm, setRoomLeavedConfirm] = useState(false)
     const [message, setMessage] = useState("");
     const [messages, setMessages] = useState([]);
-    const [currentRoom, setCurrentRoom] = useState({ name: 'WebChat', avatar: '/uploads/user.png' });
+    const [currentRoom] = useCurrentRoom()
     const [showSidebar, setShowSidebar] = useState(true);
     const [hovered, setHovered] = useState(false);
     const [user, setUser] = useState({ name: '', avatar: '', username: '' })
     const [modalType, setModalType] = useState(""); // "create" or "join"
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [rooms, setRooms] = useState([])
     const [leaveRoomShow, setLeaveRoomShow] = useState(false)
+    const [isSocketConnected, setIsSocketConnected] = useState(false)
 
     const messagesEndRef = useRef(null);
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
+    useEffect(() => {
+        socket.connect()
+        socket.on('connect', () => {
+            setIsSocketConnected(true)
+        })
+
+        // Msg Receive
+        socket.on('msg-receive', msg => {
+            console.log(msg);
+        })
+
+        return () => {
+            socket.off('connect');
+        }
+    }, [])
+
     useEffect(() => {
         roomLeavedConfirm && console.log('Room leaved : ', currentRoom)
         return () => {
@@ -80,6 +99,10 @@ const Chat = () => {
 
         setMessages((prev) => [...prev, newMessage]);
         setMessage("");
+
+        // Emit message in room
+        // isSocketConnected && socket.emit('msg-sent', { msg: newMessage, roomId????? })
+
     };
     return (
         <div className="h-screen w-screen text-white flex flex-col bg-black overflow-hidden">
@@ -120,7 +143,7 @@ const Chat = () => {
                             <h2 className="text-lg font-semibold text-gray-300">Rooms</h2>
                             <Users2 className="w-4 h-4" />
                         </div>
-                        <RoomsList setCurrentRoom={setCurrentRoom} rooms={rooms} setRooms={setRooms} />
+                        <RoomsList />
                     </div>
                 </motion.div>
 
@@ -179,10 +202,7 @@ const Chat = () => {
                 {isModalOpen && (
                     modalType == 'create' ?
                         <CreateRoom
-                            closeModal={closeModal}
-                            setCurrentRoom={setCurrentRoom}
-                            setRooms={setRooms}
-                        /> :
+                            closeModal={closeModal} /> :
                         <JoinRoom closeModal={closeModal} />
                 )}
             </AnimatePresence>
@@ -192,10 +212,6 @@ const Chat = () => {
                     setLeaveRoomShow={setLeaveRoomShow}
                     setRoomLeavedConfirm={setRoomLeavedConfirm}
                     user={user}
-                    currentRoom={currentRoom}
-                    setRooms={setRooms}
-                    rooms={rooms}
-                    setCurrentRoom={setCurrentRoom}
                 />
             }
         </div>

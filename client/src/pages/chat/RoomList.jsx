@@ -1,7 +1,12 @@
 import { motion } from "framer-motion";
 import { useEffect } from "react";
+import { useCurrentRoom } from "../../context/currentRoom";
+import { useRooms } from "../../context/rooms";
+import { socket } from "../../socket";
 
-const RoomsList = ({ setCurrentRoom, rooms, setRooms }) => {
+const RoomsList = () => {
+    const [, setCurrentRoom] = useCurrentRoom()
+    const [rooms, setRooms] = useRooms()
     useEffect(() => {
         fetch("http://localhost:3000/api/v0/get/rooms", { credentials: "include" })
             .then((res) => res.json())
@@ -9,7 +14,8 @@ const RoomsList = ({ setCurrentRoom, rooms, setRooms }) => {
                 if (statusCode === 200) {
                     const rooms = data[0].rooms
                     setRooms(rooms)
-                    setCurrentRoom(rooms[0])
+                    socket.emit('initial-join', { rooms: rooms.map(room => room.roomId) })
+                    if (rooms.length > 0) setCurrentRoom(rooms[0])
                 }
             });
     }, [])
