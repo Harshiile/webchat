@@ -36,8 +36,9 @@ const Chat = () => {
         })
 
         // Msg Receive
-        socket.on('msg-receive', msg => {
+        socket.on('msg-receive', ({ msg }) => {
             console.log(msg);
+            // setMessages((prev) => [...prev, msg]);
         })
 
         return () => {
@@ -103,10 +104,8 @@ const Chat = () => {
 
         // Emit message in room
         if (isSocketConnected) {
+            newMessage.sender = newMessage.senderName
             socket.emit('msg-sent', { msg: newMessage, room: currentRoom.roomId })
-            socket.on('msg-receive', msg => {
-
-            })
         }
     };
     return (
