@@ -11,6 +11,7 @@ import LeaveRoomDialog from "./Leave";
 import { useRooms } from "../../context/rooms";
 import { useCurrentRoom } from "../../context/currentRoom";
 import { socket } from '../../socket'
+import { encode, decode } from 'js-base64'
 
 const Chat = () => {
     const [roomLeavedConfirm, setRoomLeavedConfirm] = useState(false)
@@ -30,19 +31,24 @@ const Chat = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
     useEffect(() => {
+        setMessages(prevMessages(currentRoom.roomId))
+    }, [currentRoom])
+
+    useEffect(() => {
         socket.connect()
         socket.on('connect', () => {
             setIsSocketConnected(true)
         })
 
         // Msg Receive
-        socket.on('msg-receive', ({ msg }) => {
-            console.log(msg);
-            // setMessages((prev) => [...prev, msg]);
+        socket.on('msg-receive', ({ msg, room }) => {
+            setMessages(prev => [...prev, msg])
+            StoreMessage(msg, room);
         })
 
         return () => {
             socket.off('connect');
+            socket.off('msg-receive');
         }
     }, [])
 
@@ -71,6 +77,14 @@ const Chat = () => {
             });
     }, []);
 
+    const prevMessages = (room) => {
+        return [JSON.parse(decode(localStorage.getItem(room) || encode('[]')))].flat()
+    }
+    const StoreMessage = (msg, room) => {
+        const newMsgs = [...prevMessages(room), msg]
+        localStorage.setItem(room, encode(JSON.stringify(newMsgs)))
+    }
+
     const openModal = (type) => {
         setModalType(type);
         setIsModalOpen(true);
@@ -90,13 +104,12 @@ const Chat = () => {
         if (!message.trim()) return;
 
         const newMessage = {
-            id: Date.now().toString(),
+            id: Date.now(),
             text: message,
-            sender: "user",
+            sender: user.name,
             timestamp: new Date(),
-            senderName: "Mcintyre",
-            roomName: currentRoom.name,
-            avatarUrl: "/uploads/user.png"
+            type: "outgoing",
+            avatarUrl: user.avatar
         };
 
         setMessages((prev) => [...prev, newMessage]);
@@ -104,7 +117,7 @@ const Chat = () => {
 
         // Emit message in room
         if (isSocketConnected) {
-            newMessage.sender = newMessage.senderName
+            StoreMessage(newMessage, currentRoom.roomId)
             socket.emit('msg-sent', { msg: newMessage, room: currentRoom.roomId })
         }
     };
@@ -164,23 +177,23 @@ const Chat = () => {
                         </button>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-6">
+                    <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-6 w-full">
                         {/* Messages will be added here */}
                         <AnimatePresence initial={false}>
                             {messages.map((msg) => (
                                 <motion.div
                                     key={msg.id}
-                                    initial={{ x: msg.sender === "user" ? 100 : -100, opacity: 0 }}
+                                    initial={{ x: msg.type === "outgoing" ? 100 : -100, opacity: 0 }}
                                     animate={{ x: 0, opacity: 1 }}
                                     exit={{ opacity: 0 }}
                                     transition={{ type: "spring", bounce: 0.3, duration: 0.6 }}
-                                    className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
+                                    className={`flex ${msg.type === "outgoing" ? "justify-end" : "justify-start"}`}
                                 >
                                     <MessageBubble
                                         text={msg.text}
                                         sender={msg.sender}
                                         timestamp={msg.timestamp}
-                                        senderName={msg.senderName}
+                                        type={msg.type}
                                         avatarUrl={msg.avatarUrl}
                                     />
                                 </motion.div>

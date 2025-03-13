@@ -4,7 +4,7 @@ const currentRoomContext = createContext()
 
 
 export const CurrentRoomProvider = ({ children }) => {
-    const [currentRoom, setCurrentRoom] = useState({ name: 'WebChat', avatar: '/uploads/user.png' })
+    const [currentRoom, setCurrentRoom] = useState({ name: 'WebChat', avatar: '/uploads/user.png', roomId: '' })
     return (
         <currentRoomContext.Provider value={[currentRoom, setCurrentRoom]}>
             {children}

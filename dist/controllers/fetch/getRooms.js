@@ -29,7 +29,6 @@ const getRooms = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         let roomDetails;
         if (typeof (user) != 'string') {
             roomDetails = yield (0, schema_1.getRoomsFromDB)(user.username);
-            console.log(roomDetails);
             res.cookie('rooms', (0, cookie_1.cookieGenerator)({ rooms: roomDetails }));
         }
         res.json({

@@ -14,6 +14,7 @@ const RoomsList = () => {
                 if (statusCode === 200) {
                     const rooms = data[0].rooms
                     setRooms(rooms)
+                    // Initial room joining
                     socket.emit('initial-join', { rooms: rooms.map(room => room.roomId) })
                     if (rooms.length > 0) setCurrentRoom(rooms[0])
                 }

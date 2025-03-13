@@ -40,9 +40,8 @@ const members = new Map();
 io.on('connection', (socket) => {
     console.log('a user connected : ', socket.id);
     socket.on('msg-sent', ({ msg, room }) => __awaiter(void 0, void 0, void 0, function* () {
-        // const roomId=members.get(roomId)
-        console.log(io.sockets.adapter.rooms);
-        io.to(room).emit('msg-receive', { msg });
+        msg.type = "ingoing";
+        io.to(room).except(socket.id).emit('msg-receive', { msg, room });
     }));
     socket.on('room-create', ({ roomId }) => {
         socket.join(roomId);
