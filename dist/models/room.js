@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.roomJoin = exports.roomDelete = exports.addRoom = void 0;
+exports.roomJoin = exports.isRoomExists = exports.roomDelete = exports.addRoom = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 const schema_1 = require("./schema");
 const cookie_1 = require("../lib/cookie");
@@ -79,6 +79,11 @@ const roomDelete = (username, roomId, roomCookie) => __awaiter(void 0, void 0, v
     }
 });
 exports.roomDelete = roomDelete;
+const isRoomExists = (roomId) => __awaiter(void 0, void 0, void 0, function* () {
+    const roomExist = yield roomModel.findById(roomId);
+    return roomExist ? true : false;
+});
+exports.isRoomExists = isRoomExists;
 const roomJoin = (username, roomId, roomCookie) => __awaiter(void 0, void 0, void 0, function* () {
     var _b;
     // 1. Check whether room is exist or not
@@ -117,21 +122,6 @@ const roomJoin = (username, roomId, roomCookie) => __awaiter(void 0, void 0, voi
     catch (error) {
         console.log('Error : ', error);
         throw new Error("Database not responding while fetching existing room");
-    }
-    try {
-        yield roomModel.findByIdAndUpdate(roomId, {
-            $push: {
-                members: username
-            }
-        });
-        // change cookie
-        const existedRooms = (0, getRoomsFromCookie_1.getRoomsFromCookie)(roomCookie) || [];
-        const newRooms = existedRooms.filter(room => room.roomId != roomId);
-        return { newRooms, roomsToken: (0, cookie_1.cookieGenerator)({ rooms: newRooms }) };
-    }
-    catch (error) {
-        console.log('Error : ', error);
-        throw new Error("Database not responding while inserting room");
     }
 });
 exports.roomJoin = roomJoin;

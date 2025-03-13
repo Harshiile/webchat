@@ -36,7 +36,6 @@ const io = new socket_io_1.Server(server, {
         credentials: true
     }
 });
-const members = new Map();
 io.on('connection', (socket) => {
     console.log('a user connected : ', socket.id);
     socket.on('msg-sent', ({ msg, room }) => __awaiter(void 0, void 0, void 0, function* () {
@@ -45,19 +44,16 @@ io.on('connection', (socket) => {
     }));
     socket.on('room-create', ({ roomId }) => {
         socket.join(roomId);
-        console.log(io.sockets.adapter.rooms);
         // const existedMembers = members.get(roomId);
         // members.set(roomId, [...existedMembers, userId])
     });
     socket.on('room-join', ({ roomId }) => {
         socket.join(roomId);
-        console.log(io.sockets.adapter.rooms);
     });
     socket.on('initial-join', ({ rooms }) => {
         for (const room of rooms) {
             socket.join(room);
         }
-        console.log(io.sockets.adapter.rooms);
     });
     socket.on('room-leave', ({ roomId }) => {
         socket.leave(roomId);

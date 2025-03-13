@@ -56,6 +56,7 @@ const LeaveRoomDialog = ({ setLeaveRoomShow, setRoomLeavedConfirm, user }) => {
                                                 if (statusCode === 200) {
                                                     setRooms(data[0])
                                                     setCurrentRoom(data[0][0])
+                                                    localStorage.removeItem(currentRoom.roomId)
                                                 }
                                             });
                                         setLeaveRoomShow(false)

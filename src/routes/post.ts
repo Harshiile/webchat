@@ -10,6 +10,7 @@ import { getUsername } from '../middlewares/getUsername'
 import { userUpload } from '../multer/users'
 import { roomUpload } from '../multer/rooms'
 import { getRooms } from '../controllers/fetch/getRooms'
+import { IsRoomExistController } from '../controllers/fetch/isRoomExist'
 
 
 const router = Router()
@@ -26,5 +27,6 @@ router.post('/logout', logoutUser)
 router.post('/room/create', roomUpload.single('avatar'), getUsername, roomController)
 router.post('/room/join', getUsername, roomJoinController)
 router.post('/room/delete', getUsername, roomDeleteController)
+router.post('/room/exist', IsRoomExistController)
 
 export default router

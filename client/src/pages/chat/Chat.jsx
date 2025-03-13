@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { MessageSquare, Plus, Users, User, Users2, LogOut, Send, X } from "lucide-react";
+import { MessageSquare, Plus, Users, User, Users2, Share2, LogOut, Send, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import RoomsList from "./RoomList";
@@ -12,8 +12,11 @@ import { useRooms } from "../../context/rooms";
 import { useCurrentRoom } from "../../context/currentRoom";
 import { socket } from '../../socket'
 import { encode, decode } from 'js-base64'
+import ToastProvider from "../../components/ToastProvider";
+import { useRoomError } from "../../context/roomError";
 
 const Chat = () => {
+    const [roomError, setRoomError] = useRoomError()
     const [roomLeavedConfirm, setRoomLeavedConfirm] = useState(false)
     const [message, setMessage] = useState("");
     const [messages, setMessages] = useState([]);
@@ -25,6 +28,16 @@ const Chat = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [leaveRoomShow, setLeaveRoomShow] = useState(false)
     const [isSocketConnected, setIsSocketConnected] = useState(false)
+
+
+    useEffect(() => {
+        if (roomError) {
+            toast.success(`${modalType === "create" ? "Room created!" : "Joined room!"}`);
+            setTimeout(() => {
+                setRoomError(false)
+            }, 2000);
+        }
+    }, [roomError])
 
     const messagesEndRef = useRef(null);
     const scrollToBottom = () => {
@@ -39,7 +52,7 @@ const Chat = () => {
         socket.on('connect', () => {
             setIsSocketConnected(true)
         })
-
+        socket.on('loading', (x) => console.log(x))
         // Msg Receive
         socket.on('msg-receive', ({ msg, room }) => {
             setMessages(prev => [...prev, msg])
@@ -94,10 +107,7 @@ const Chat = () => {
         setIsModalOpen(false);
     };
 
-    const handleRoomSubmit = () => {
-        toast.success(`${modalType === "create" ? "Room created!" : "Joined room!"}`);
-        closeModal();
-    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
 
@@ -123,6 +133,7 @@ const Chat = () => {
     };
     return (
         <div className="h-screen w-screen text-white flex flex-col bg-black overflow-hidden">
+            <ToastProvider />
             {/* Navbar */}
             <motion.nav initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="bg-zinc-900 px-6 py-4 border-b border-zinc-800 flex items-center justify-between">
                 <div className="flex items-center space-x-2">
@@ -166,19 +177,36 @@ const Chat = () => {
 
                 {/* Chat Section */}
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="flex-1 flex flex-col bg-zinc-950">
+
                     <div className="px-6 py-4 border-b border-zinc-800 flex justify-between items-center bg-zinc-900">
                         <div className="flex items-center gap-x-3.5">
                             <img src={currentRoom.avatar} className="w-10 h-10 rounded-full border border-gray-600 shadow-sm" />
                             <h3 className="text-lg font-semibold">{currentRoom.name}</h3>
                         </div>
-                        <button onClick={() => setLeaveRoomShow(true)} className="flex items-center space-x-2 text-red-400 hover:text-red-300 px-3 py-2 rounded-lg hover:bg-red-400/10 transition-colors">
-                            <LogOut className="w-4 h-4" />
-                            <span>Leave Room</span>
-                        </button>
+                        <div className="flex items-center space-x-2">
+                            <button onClick={() => {
+                                navigator.clipboard.writeText(`${window.location.href}/room/join/${encode(currentRoom.roomId)}`)
+                                toast.success(`Room Link Copied 🎉`, {
+                                    duration: 5000,
+                                    style: { backgroundColor: "#16a34a", color: "white", fontSize: "1rem" },
+                                });
+                            }} className={`flex items-center space-x-2 text-indigo-400 hover:text-indigo-300 px-3 py-2 rounded-lg hover:bg-indigo-400/10 transition-colors ${!currentRoom.roomId ? 'cursor-not-allowed' : ''}`} disabled={!currentRoom.roomId}>
+                                <Share2 className="w-4 h-4" />
+                                <span>Share Room</span>
+                            </button>
+                            <button onClick={() => setLeaveRoomShow(true)} className={`flex items-center space-x-2 text-red-400 hover:text-red-300 px-3 py-2 rounded-lg hover:bg-red-400/10 transition-colors ${!currentRoom.roomId ? 'cursor-not-allowed' : ''} `} disabled={!currentRoom.roomId}>
+                                <LogOut className="w-4 h-4" />
+                                <span>Leave Room</span>
+                            </button>
+                        </div>
                     </div>
 
                     <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-6 w-full">
                         {/* Messages will be added here */}
+                        {
+                            !messages.length > 0 &&
+                            <p className="justify-self-center mt-8 text-gray-400 font-bold">No Messages There</p>
+                        }
                         <AnimatePresence initial={false}>
                             {messages.map((msg) => (
                                 <motion.div
@@ -231,7 +259,7 @@ const Chat = () => {
                     user={user}
                 />
             }
-        </div>
+        </div >
     );
 };
 

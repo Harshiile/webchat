@@ -67,7 +67,10 @@ export const roomDelete = async (username: string, roomId: mongoose.Types.Object
     }
 }
 
-
+export const isRoomExists = async (roomId: mongoose.Types.ObjectId): Promise<boolean> => {
+    const roomExist = await roomModel.findById(roomId);
+    return roomExist ? true : false;
+}
 export const roomJoin = async (username: string, roomId: mongoose.Types.ObjectId, roomCookie: string) => {
 
     // 1. Check whether room is exist or not
@@ -105,22 +108,5 @@ export const roomJoin = async (username: string, roomId: mongoose.Types.ObjectId
     } catch (error) {
         console.log('Error : ', error);
         throw new Error("Database not responding while fetching existing room");
-    }
-
-    try {
-        await roomModel.findByIdAndUpdate(roomId, {
-            $push: {
-                members: username
-            }
-        })
-
-        // change cookie
-        const existedRooms = getRoomsFromCookie(roomCookie) || []
-        const newRooms = existedRooms.filter(room => room.roomId != roomId)
-
-        return { newRooms, roomsToken: cookieGenerator({ rooms: newRooms }) }
-    } catch (error) {
-        console.log('Error : ', error);
-        throw new Error("Database not responding while inserting room");
     }
 }

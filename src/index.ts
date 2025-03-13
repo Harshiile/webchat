@@ -26,9 +26,6 @@ const io = new Server(server, {
     }
 });
 
-
-const members = new Map();
-
 io.on('connection', (socket) => {
     console.log('a user connected : ', socket.id);
 
@@ -38,20 +35,16 @@ io.on('connection', (socket) => {
     })
     socket.on('room-create', ({ roomId }) => {
         socket.join(roomId);
-        console.log(io.sockets.adapter.rooms);
         // const existedMembers = members.get(roomId);
         // members.set(roomId, [...existedMembers, userId])
     })
     socket.on('room-join', ({ roomId }) => {
         socket.join(roomId);
-        console.log(io.sockets.adapter.rooms);
     })
     socket.on('initial-join', ({ rooms }) => {
         for (const room of rooms) {
             socket.join(room)
         }
-        console.log(io.sockets.adapter.rooms);
-
     })
     socket.on('room-leave', ({ roomId }) => {
         socket.leave(roomId);
