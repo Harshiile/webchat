@@ -6,7 +6,8 @@
   "scripts": {
     "build": "tsc --watch",
     "start": "node dist/index.js",
-    "dev": "nodemon dist/index.js"
+    "server": "nodemon dist/index.js",
+    "client":"cd client && npm run dev"
   },
   "keywords": [],
   "author": "",
