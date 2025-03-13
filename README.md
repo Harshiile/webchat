@@ -30,7 +30,7 @@
 
 1. **Build the project :**
    ```sh
-   tsc build
+   tsc -b
    ```
 
 2. **Start the backend server :**
@@ -39,6 +39,7 @@
    ```
 
 3. **Start the frontend :**
+   #### Open new terminal after run following command
    ```sh
    npm run client
    ```
