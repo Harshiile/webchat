@@ -169,7 +169,7 @@ const Profile = () => {
                     <div className="relative group">
                         <img
                             className="w-24 h-24 md:w-32 md:h-32 border-2 border-zinc-700 object-cover rounded-full transition-transform duration-300 group-hover:scale-105"
-                            src={`/uploads/${user.avatar}`}
+                            src={user.avatar}
                             alt="User Avatar"
                         />
                     </div>

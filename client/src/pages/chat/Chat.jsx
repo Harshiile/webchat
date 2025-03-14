@@ -83,7 +83,7 @@ const Chat = () => {
                 if (statusCode === 200) {
                     setUser({
                         name: data.user.name,
-                        avatar: `/uploads/${data.user.avatar}`,
+                        avatar: data.user.avatar,
                         username: data.user.username
                     });
                 }

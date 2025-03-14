@@ -14,21 +14,16 @@ createRoot(document.getElementById('root')).render(
       <CurrentRoomProvider>
         <Router>
           <Routes>
-
             <Route element={<NoAuth />}>
               <Route path="/login" element={<Login />} />
             </Route>
 
             <Route path="/signup" element={<Signup />} />
-
-            <Route element={<Auth />}>
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/chat">
-                <Route path='' element={<Chat />} />
-                <Route path='room/join/:roomId' element={<JoinRoomLink />} />
-              </Route>
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/chat">
+              <Route path='' element={<Chat />} />
+              <Route path='room/join/:roomId' element={<JoinRoomLink />} />
             </Route>
-
           </Routes>
         </Router>
       </CurrentRoomProvider>

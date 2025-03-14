@@ -20,6 +20,7 @@ router.get('/get/rooms', getRooms_1.getRooms);
 router.post('/update/profile', users_1.userUpload.single('avatar'), update_1.updateUserInDB);
 router.post('/login', login_1.loginController);
 router.post('/signup', users_1.userUpload.single('avatar'), signup_1.signUpController);
+router.post('/auth/google', signup_1.oAuthGoogleController);
 router.post('/logout', logout_1.logoutUser);
 router.post('/room/create', rooms_1.roomUpload.single('avatar'), getUsername_1.getUsername, room_1.roomController);
 router.post('/room/join', getUsername_1.getUsername, room_1.roomJoinController);
