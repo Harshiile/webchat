@@ -1,1 +1,1 @@
-1. Middleware not working - NoAuth
+1. friends attribute in users schema

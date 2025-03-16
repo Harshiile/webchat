@@ -13,6 +13,7 @@ const users_1 = require("../multer/users");
 const rooms_1 = require("../multer/rooms");
 const getRooms_1 = require("../controllers/fetch/getRooms");
 const isRoomExist_1 = require("../controllers/fetch/isRoomExist");
+const getMembers_1 = require("../controllers/fetch/getMembers");
 const router = (0, express_1.Router)();
 router.post('/get/username', usernameCheck_1.usernameCheck);
 router.get('/get/user', userdata_1.userDataFromAuth);
@@ -26,4 +27,5 @@ router.post('/room/create', rooms_1.roomUpload.single('avatar'), getUsername_1.g
 router.post('/room/join', getUsername_1.getUsername, room_1.roomJoinController);
 router.post('/room/delete', getUsername_1.getUsername, room_1.roomDeleteController);
 router.post('/room/exist', isRoomExist_1.IsRoomExistController);
+router.post('/room/members', getMembers_1.getMemberController);
 exports.default = router;

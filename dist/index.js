@@ -49,6 +49,7 @@ io.on('connection', (socket) => {
     });
     socket.on('room-join', ({ roomId }) => {
         socket.join(roomId);
+        // socket.to(roomId).emit('room-joined')
     });
     socket.on('initial-join', ({ rooms }) => {
         for (const room of rooms) {

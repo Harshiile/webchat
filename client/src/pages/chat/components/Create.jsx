@@ -3,9 +3,9 @@ import { ArrowRight, Globe2, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import Modal from "./Model";
-import { useCurrentRoom } from "../../context/currentRoom";
-import { useRooms } from "../../context/rooms";
-import { socket } from "../../socket";
+import { socket } from "../../../socket";
+import { useRooms } from "../../../context/rooms";
+import { useCurrentRoom } from "../../../context/currentRoom";
 
 const CreateRoom = ({ closeModal }) => {
     const [name, setName] = useState("");

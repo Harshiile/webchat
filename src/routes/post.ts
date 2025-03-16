@@ -11,6 +11,7 @@ import { userUpload } from '../multer/users'
 import { roomUpload } from '../multer/rooms'
 import { getRooms } from '../controllers/fetch/getRooms'
 import { IsRoomExistController } from '../controllers/fetch/isRoomExist'
+import { getMemberController } from '../controllers/fetch/getMembers'
 
 
 const router = Router()
@@ -29,5 +30,6 @@ router.post('/room/create', roomUpload.single('avatar'), getUsername, roomContro
 router.post('/room/join', getUsername, roomJoinController)
 router.post('/room/delete', getUsername, roomDeleteController)
 router.post('/room/exist', IsRoomExistController)
+router.post('/room/members', getMemberController)
 
 export default router

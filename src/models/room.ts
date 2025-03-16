@@ -110,3 +110,44 @@ export const roomJoin = async (username: string, roomId: mongoose.Types.ObjectId
         throw new Error("Database not responding while fetching existing room");
     }
 }
+
+export const getMembers = async (roomId: mongoose.Types.ObjectId): Promise<Array<Object>> => {
+    console.log('getMembers > roomId : ', roomId);
+
+    return await roomModel.aggregate(
+        [
+            {
+                $match: {
+                    _id: new mongoose.Types.ObjectId(roomId),
+                },
+            },
+            {
+                $unwind: "$members"
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "members",
+                    foreignField: "username",
+                    as: "result"
+                }
+            },
+            {
+                $project: {
+                    members: { $first: "$result" }
+                }
+            },
+            {
+                $project: {
+                    name: "$members.name",
+                    username: "$members.username",
+                    avatar: "$members.avatar",
+                    id: "$members._id"
+                }
+            },
+            {
+                $unset: "_id"
+            }
+        ]
+    )
+}

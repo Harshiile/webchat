@@ -1,7 +1,9 @@
 import { GoogleLogin } from '@react-oauth/google'
 import { jwtDecode } from 'jwt-decode'
+import { useNavigate } from 'react-router-dom';
 import { toast } from "sonner";
 const GoogleAuth = () => {
+    const navigate = useNavigate()
     return (
         <GoogleLogin
             onSuccess={async ({ credential }) => {
@@ -30,7 +32,7 @@ const GoogleAuth = () => {
                                 style: { backgroundColor: "#16a34a", color: "white", fontSize: "1rem" },
                             });
                             setTimeout(() => {
-                                window.location.href = redirectUrl;
+                                navigate(redirectUrl)
                             }, 700);
                         }
                     })

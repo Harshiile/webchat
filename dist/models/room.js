@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.roomJoin = exports.isRoomExists = exports.roomDelete = exports.addRoom = void 0;
+exports.getMembers = exports.roomJoin = exports.isRoomExists = exports.roomDelete = exports.addRoom = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 const schema_1 = require("./schema");
 const cookie_1 = require("../lib/cookie");
@@ -125,3 +125,41 @@ const roomJoin = (username, roomId, roomCookie) => __awaiter(void 0, void 0, voi
     }
 });
 exports.roomJoin = roomJoin;
+const getMembers = (roomId) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log('getMembers > roomId : ', roomId);
+    return yield roomModel.aggregate([
+        {
+            $match: {
+                _id: new mongoose_1.default.Types.ObjectId(roomId),
+            },
+        },
+        {
+            $unwind: "$members"
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "members",
+                foreignField: "username",
+                as: "result"
+            }
+        },
+        {
+            $project: {
+                members: { $first: "$result" }
+            }
+        },
+        {
+            $project: {
+                name: "$members.name",
+                username: "$members.username",
+                avatar: "$members.avatar",
+                id: "$members._id"
+            }
+        },
+        {
+            $unset: "_id"
+        }
+    ]);
+});
+exports.getMembers = getMembers;

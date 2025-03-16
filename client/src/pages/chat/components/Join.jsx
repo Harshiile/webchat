@@ -2,9 +2,9 @@ import { useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import Modal from "./Model";
-import { socket } from "../../socket";
-import { useRooms } from "../../context/rooms";
-import { useCurrentRoom } from "../../context/currentRoom";
+import { socket } from '../../../socket'
+import { useRooms } from "../../../context/rooms";
+import { useCurrentRoom } from "../../../context/currentRoom";
 
 const JoinRoom = ({ closeModal }) => {
     const [, setRooms] = useRooms()
