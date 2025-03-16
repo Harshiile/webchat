@@ -13,7 +13,7 @@ interface UpdateUser {
 }
 
 const deleteOldAvatar = (oldavatar: string) => {
-    const oldAvatarPath = path.join(__dirname, `../../client/public/uploads/${oldavatar}`);
+    const oldAvatarPath = path.join(__dirname, `../../client/public${oldavatar}`);
     fs.rmSync(oldAvatarPath)
 }
 
@@ -28,11 +28,11 @@ export const updateUserInDB = async (req: Request<{}, {}, UpdateUser>, res: Resp
         }
     }
     const { username: newUsername, name } = req.body
-    if (req.file && oldavatar != 'user.png') {
+    if (req.file && oldavatar != '/uploads/user.png') {
         deleteOldAvatar(oldavatar)
     }
     try {
-        const avatar = req.file?.filename || ''
+        const avatar = `/uploads/${req.file?.filename || ''}`
         await updateUser(oldUsername, newUsername, avatar, name)
         const loginCookie = cookieGenerator({ username: newUsername, name, avatar })
         res.cookie('auth', loginCookie, {

@@ -163,7 +163,6 @@ const Profile = () => {
                         </button>
                     </div>
                 </div>
-
                 {/* Profile Info */}
                 <div className="flex flex-col justify-center md:flex-row gap-x-8 p-4 items-center md:items-center">
                     <div className="relative group">

@@ -29,7 +29,7 @@ const userSchema = new mongoose_1.default.Schema({
     rooms: (Array)
 });
 const userModel = mongoose_1.default.model('users', userSchema);
-const userAdd = ({ email, password, username, name, avatar }) => __awaiter(void 0, void 0, void 0, function* () {
+const userAdd = (_a) => __awaiter(void 0, [_a], void 0, function* ({ email, password, username, name, avatar }) {
     try {
         yield userModel.create({
             email,

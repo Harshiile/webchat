@@ -14,11 +14,16 @@ createRoot(document.getElementById('root')).render(
       <CurrentRoomProvider>
         <Router>
           <Routes>
-            <Route element={<NoAuth />}>
-              <Route path="/login" element={<Login />} />
-            </Route>
-
-            <Route path="/signup" element={<Signup />} />
+            <Route path="/login" element={
+              <NoAuth>
+                <Login />
+              </NoAuth>
+            } />
+            <Route path="/signup" element={
+              <NoAuth>
+                <Login />
+              </NoAuth>
+            } />
             <Route path="/profile" element={<Profile />} />
             <Route path="/chat">
               <Route path='' element={<Chat />} />

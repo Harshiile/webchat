@@ -38,7 +38,7 @@ const io = new socket_io_1.Server(server, {
 });
 io.on('connection', (socket) => {
     console.log('a user connected : ', socket.id);
-    socket.on('msg-sent', ({ msg, room }) => __awaiter(void 0, void 0, void 0, function* () {
+    socket.on('msg-sent', (_a) => __awaiter(void 0, [_a], void 0, function* ({ msg, room }) {
         msg.type = "ingoing";
         io.to(room).except(socket.id).emit('msg-receive', { msg, room });
     }));

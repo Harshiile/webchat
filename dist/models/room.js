@@ -25,8 +25,8 @@ const roomSchema = new mongoose_1.default.Schema({
     members: (Array)
 });
 const roomModel = mongoose_1.default.model('rooms', roomSchema);
-const addRoom = ({ name, avatar, createBy, isPrivate }, roomCookie) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
+const addRoom = (_a, roomCookie_1) => __awaiter(void 0, [_a, roomCookie_1], void 0, function* ({ name, avatar, createBy, isPrivate }, roomCookie) {
+    var _b;
     try {
         avatar = `/rooms/${avatar}`;
         const room = yield roomModel.create({
@@ -45,7 +45,7 @@ const addRoom = ({ name, avatar, createBy, isPrivate }, roomCookie) => __awaiter
                 roomId: room._id,
                 avatar,
                 isPrivate,
-                totalMembers: (_a = room.members) === null || _a === void 0 ? void 0 : _a.length
+                totalMembers: (_b = room.members) === null || _b === void 0 ? void 0 : _b.length
             }];
         return {
             _id: room._id,
@@ -85,7 +85,7 @@ const isRoomExists = (roomId) => __awaiter(void 0, void 0, void 0, function* () 
 });
 exports.isRoomExists = isRoomExists;
 const roomJoin = (username, roomId, roomCookie) => __awaiter(void 0, void 0, void 0, function* () {
-    var _b;
+    var _a;
     // 1. Check whether room is exist or not
     try {
         const roomExist = yield roomModel.findById(roomId);
@@ -103,7 +103,7 @@ const roomJoin = (username, roomId, roomCookie) => __awaiter(void 0, void 0, voi
                     avatar: roomExist.avatar,
                     roomId: roomExist._id.toString(),
                     isPrivate: roomExist.isPrivate,
-                    totalMembers: ((_b = roomExist.members) === null || _b === void 0 ? void 0 : _b.length) || 0 + 1
+                    totalMembers: ((_a = roomExist.members) === null || _a === void 0 ? void 0 : _a.length) || 0 + 1
                 };
                 const newRooms = [...existedRooms, newRoom];
                 return { newRoom, roomsToken: (0, cookie_1.cookieGenerator)({ rooms: newRooms }) };

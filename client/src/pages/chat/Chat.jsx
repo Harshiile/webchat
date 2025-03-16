@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { MessageSquare, Plus, Users, User, Users2, Share2, LogOut, Send, X } from "lucide-react";
+import { MessageSquare, Plus, Users, User, Users2, Share2, LogOut, Send, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import RoomsList from "./RoomList";
@@ -28,6 +28,72 @@ const Chat = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [leaveRoomShow, setLeaveRoomShow] = useState(false)
     const [isSocketConnected, setIsSocketConnected] = useState(false)
+    const [showMembersDropdown, setShowMembersDropdown] = useState(false);
+
+    const [tmpMembers, setTmpMembers] = useState([
+        {
+            id: 1,
+            name: 'Harshil',
+            username: 'harshiile',
+            avatar: '/rooms/Avatar_1742097040110.png'
+        },
+        {
+            id: 2,
+            name: 'Aarav',
+            username: 'aarav123',
+            avatar: '/rooms/Avatar_1742097040110.png'
+        },
+        {
+            id: 3,
+            name: 'Meera',
+            username: 'meerax',
+            avatar: '/rooms/Avatar_1742097040110.png'
+        },
+        {
+            id: 4,
+            name: 'Rohan',
+            username: 'rohan_dev',
+            avatar: '/rooms/Avatar_1742097040110.png'
+        },
+        {
+            id: 5,
+            name: 'Sanya',
+            username: 'sanya_k',
+            avatar: '/rooms/Avatar_1742097040110.png'
+        },
+        {
+            id: 6,
+            name: 'Dev',
+            username: 'dev_coder',
+            avatar: '/rooms/Avatar_1742097040110.png'
+        },
+        {
+            id: 7,
+            name: 'Ishaan',
+            username: 'ishaan_07',
+            avatar: '/rooms/Avatar_1742097040110.png'
+        },
+        {
+            id: 8,
+            name: 'Tanya',
+            username: 'tanya88',
+            avatar: '/rooms/Avatar_1742097040110.png'
+        },
+        {
+            id: 9,
+            name: 'Kabir',
+            username: 'kabir_king',
+            avatar: '/rooms/Avatar_1742097040110.png'
+        },
+        {
+            id: 10,
+            name: 'Ananya',
+            username: 'ananya_star',
+            avatar: '/rooms/Avatar_1742097040110.png'
+        }
+    ]);
+
+
 
 
     useEffect(() => {
@@ -97,6 +163,9 @@ const Chat = () => {
         const newMsgs = [...prevMessages(room), msg]
         localStorage.setItem(room, encode(JSON.stringify(newMsgs)))
     }
+    const toggleMembersDropdown = () => {
+        setShowMembersDropdown(!showMembersDropdown);
+    };
 
     const openModal = (type) => {
         setModalType(type);
@@ -181,7 +250,10 @@ const Chat = () => {
                     <div className="px-6 py-4 border-b border-zinc-800 flex justify-between items-center bg-zinc-900">
                         <div className="flex items-center gap-x-3.5">
                             <img src={currentRoom.avatar} className="w-10 h-10 rounded-full border border-gray-600 shadow-sm" />
-                            <h3 className="text-lg font-semibold">{currentRoom.name}</h3>
+                            <div className="flex items-center cursor-pointer" onClick={toggleMembersDropdown}>
+                                <h3 className="text-lg font-semibold">{currentRoom.name}</h3>
+                                <ChevronDown className={`w-5 h-5 ml-2 transition-transform ${showMembersDropdown ? 'rotate-180' : ''}`} />
+                            </div>
                         </div>
                         <div className="flex items-center space-x-2">
                             <button onClick={() => {
@@ -201,8 +273,31 @@ const Chat = () => {
                         </div>
                     </div>
 
-                    <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-6 w-full">
+                    <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-6 w-full relative">
                         {/* Messages will be added here */}
+                        <AnimatePresence>
+                            {showMembersDropdown && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                                    className="absolute top-0 left-0 w-72 bg-zinc-800 rounded-lg shadow-lg border border-zinc-700 z-50"
+                                >
+                                    <div className="max-h-96 overflow-y-auto">
+                                        {tmpMembers?.map((member) => (
+                                            <div key={member.id} className="p-3 hover:bg-zinc-700 transition-colors flex items-center space-x-3">
+                                                <img src={member.avatar} alt={member.name} className="w-8 h-8 rounded-full border border-zinc-600" />
+                                                <div>
+                                                    <p className="font-medium text-sm">{member.name}</p>
+                                                    <p className="text-xs text-gray-400">@{member.username}</p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                         {
                             !messages.length > 0 &&
                             <p className="justify-self-center mt-8 text-gray-400 font-bold">No Messages There</p>

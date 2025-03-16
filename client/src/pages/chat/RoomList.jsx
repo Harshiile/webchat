@@ -14,13 +14,14 @@ const RoomsList = () => {
                 if (statusCode === 200) {
                     const rooms = data[0].rooms
                     setRooms(rooms)
+                    console.log(rooms);
+
                     // Initial room joining
                     socket.emit('initial-join', { rooms: rooms.map(room => room.roomId) })
                     if (rooms.length > 0) setCurrentRoom(rooms[0])
                 }
             });
     }, [])
-
     return (
         <div className="space-y-2">
             {rooms && rooms.map((room, index) => (

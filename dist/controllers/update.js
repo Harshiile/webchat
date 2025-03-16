@@ -18,7 +18,7 @@ const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const cookie_1 = require("../lib/cookie");
 const deleteOldAvatar = (oldavatar) => {
-    const oldAvatarPath = path_1.default.join(__dirname, `../../client/public/uploads/${oldavatar}`);
+    const oldAvatarPath = path_1.default.join(__dirname, `../../client/public${oldavatar}`);
     fs_1.default.rmSync(oldAvatarPath);
 };
 const updateUserInDB = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -33,11 +33,11 @@ const updateUserInDB = (req, res) => __awaiter(void 0, void 0, void 0, function*
         }
     }
     const { username: newUsername, name } = req.body;
-    if (req.file && oldavatar != 'user.png') {
+    if (req.file && oldavatar != '/uploads/user.png') {
         deleteOldAvatar(oldavatar);
     }
     try {
-        const avatar = ((_a = req.file) === null || _a === void 0 ? void 0 : _a.filename) || '';
+        const avatar = `/uploads/${((_a = req.file) === null || _a === void 0 ? void 0 : _a.filename) || ''}`;
         yield (0, schema_1.updateUser)(oldUsername, newUsername, avatar, name);
         const loginCookie = (0, cookie_1.cookieGenerator)({ username: newUsername, name, avatar });
         res.cookie('auth', loginCookie, {

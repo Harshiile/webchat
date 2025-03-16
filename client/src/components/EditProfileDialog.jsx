@@ -5,7 +5,7 @@ const EditProfileDialog = ({ isOpen, onClose, onSave, currentData }) => {
     const [updateData, setUpdateData] = useState(currentData);
     useEffect(() => {
         setUpdateData({
-            avatar: `/uploads/${currentData.avatar}`,
+            avatar: currentData.avatar,
             name: currentData.name,
             username: currentData.username
         });

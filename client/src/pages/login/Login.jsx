@@ -139,7 +139,9 @@ const Login = () => {
                                 </Link>
                             </p>
                         </div>
-                        <GoogleAuth />
+                        <div className="w-max mx-auto">
+                            <GoogleAuth />
+                        </div>
                     </form>
                 </motion.div>
             </GoogleOAuthProvider>

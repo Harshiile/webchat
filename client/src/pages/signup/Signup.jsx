@@ -230,7 +230,9 @@ const Signup = () => {
                             Sign up
                             <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                         </motion.button>
-                        <GoogleAuth />
+                        <div className="w-max mx-auto">
+                            <GoogleAuth />
+                        </div>
                     </form>
                 </motion.div>
             </GoogleOAuthProvider>
