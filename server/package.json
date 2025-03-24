@@ -7,7 +7,7 @@
     "build": "tsc --watch",
     "start": "node dist/index.js",
     "server": "nodemon dist/index.js",
-    "client":"cd client && npm run dev"
+    "client": "cd client && npm run dev"
   },
   "keywords": [],
   "author": "",
@@ -24,7 +24,8 @@
     "mongoose": "^8.10.1",
     "multer": "^1.4.5-lts.1",
     "nodemon": "^3.1.9",
-    "socket.io": "^4.8.1"
+    "socket.io": "^4.8.1",
+    "typescript": "^5.8.2"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.8",
