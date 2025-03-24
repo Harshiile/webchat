@@ -69,8 +69,7 @@ const Profile = () => {
     const handleProfileUpdate = (newData) => {
         setUser(newData);
         setShowEditDialog(false);
-        window.location.reload()
-        toast.success("Profile updated successfully!");
+        // window.location.reload()
     };
 
     const logoutHandler = () => {
@@ -209,7 +208,6 @@ const Profile = () => {
                                         setCurrentRoom({
                                             name: room.name,
                                             avatar: room.avatar,
-                                            totalMembers: room.totalMembers,
                                             isPrivate: room.isPrivate,
                                             roomId: room.roomId
                                         })
@@ -222,7 +220,7 @@ const Profile = () => {
                                             <span className="font-bold text-xl capitalize">{room.name}</span>
                                             <div className="flex items-center gap-1 text-zinc-400 text-sm mt-1">
                                                 <User className="w-4 h-4" />
-                                                <span>{room.totalMembers} members</span>
+                                                <span>{room.members.length} members</span>
                                             </div>
                                         </div>
                                         <div>

@@ -136,7 +136,7 @@ const getRoomsFromDB = (username) => __awaiter(void 0, void 0, void 0, function*
                 avatar: "$rooms.avatar",
                 isPrivate: "$rooms.isPrivate",
                 roomId: "$rooms._id",
-                totalMembers: { $size: "$rooms.members" },
+                members: "$rooms.members",
             },
         },
         {

@@ -188,28 +188,32 @@ const Chat = () => {
                                     <ChevronDown className={`w-5 h-5 ml-2 transition-transform ${showMembersDropdown ? 'rotate-180' : ''}`} />
                                 </div>
                             </div>
-                            <div className="flex items-center space-x-2">
-                                <button onClick={() => {
-                                    navigator.clipboard.writeText(`${window.location.href}/room/join/${encode(currentRoom.roomId)}`)
-                                    toast.success(`Room Link Copied 🎉`, {
-                                        duration: 5000,
-                                        style: { backgroundColor: "#16a34a", color: "white", fontSize: "1rem" },
-                                    });
-                                }} className={`flex items-center space-x-2 text-indigo-400 hover:text-indigo-300 px-3 py-2 rounded-lg hover:bg-indigo-400/10 transition-colors ${!currentRoom.roomId ? 'cursor-not-allowed' : ''}`} disabled={!currentRoom.roomId}>
-                                    <Share2 className="w-4 h-4" />
-                                    <span>Share Room</span>
-                                </button>
-                                <button onClick={() => setLeaveRoomShow(true)} className={`flex items-center space-x-2 text-red-400 hover:text-red-300 px-3 py-2 rounded-lg hover:bg-red-400/10 transition-colors ${!currentRoom.roomId ? 'cursor-not-allowed' : ''} `} disabled={!currentRoom.roomId}>
-                                    <LogOut className="w-4 h-4" />
-                                    <span>Leave Room</span>
-                                </button>
-                            </div>
+                            {
+                                currentRoom.roomId &&
+                                < div className="flex items-center space-x-2">
+                                    <button onClick={() => {
+                                        navigator.clipboard.writeText(`${window.location.href}/room/join/${encode(currentRoom.roomId)}`)
+                                        toast.success(`Room Link Copied 🎉`, {
+                                            duration: 5000,
+                                            style: { backgroundColor: "#16a34a", color: "white", fontSize: "1rem" },
+                                        });
+                                    }} className={`flex items-center space-x-2 text-indigo-400 hover:text-indigo-300 px-3 py-2 rounded-lg hover:bg-indigo-400/10 transition-colors ${!currentRoom.roomId ? 'cursor-not-allowed' : ''}`} disabled={!currentRoom.roomId}>
+                                        <Share2 className="w-4 h-4" />
+                                        <span>Share Room</span>
+                                    </button>
+                                    <button onClick={() => setLeaveRoomShow(true)} className={`flex items-center space-x-2 text-red-400 hover:text-red-300 px-3 py-2 rounded-lg hover:bg-red-400/10 transition-colors ${!currentRoom.roomId ? 'cursor-not-allowed' : ''} `} disabled={!currentRoom.roomId}>
+                                        <LogOut className="w-4 h-4" />
+                                        <span>Leave Room</span>
+                                    </button>
+                                </div>
+                            }
+
                         </div>
 
                         <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-6 w-full relative">
                             {/* Messages will be added here */}
                             <AnimatePresence>
-                                {showMembersDropdown && <RoomMembers />}
+                                {showMembersDropdown && <RoomMembers user={user} />}
                             </AnimatePresence>
                             {
                                 !messages.length > 0 &&
@@ -248,17 +252,18 @@ const Chat = () => {
                             </div>
                         </motion.form>
                     </motion.div>
-                </div>
+                </div >
 
                 {/* Modal Dialog for Creating/Joining Room */}
-                <AnimatePresence>
+                < AnimatePresence >
                     {isModalOpen && (
                         modalType == 'create' ?
                             <CreateRoom
                                 closeModal={closeModal} /> :
                             <JoinRoom closeModal={closeModal} />
-                    )}
-                </AnimatePresence>
+                    )
+                    }
+                </AnimatePresence >
 
                 {
                     leaveRoomShow && <LeaveRoomDialog

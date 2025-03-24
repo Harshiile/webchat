@@ -6,29 +6,30 @@ import { toast } from 'sonner'
 import { socket } from '../../../socket'
 
 
-const RoomMembers = () => {
+const RoomMembers = ({ user }) => {
     const [currentRoom, setCurrentRoom] = useCurrentRoom()
     const [searchQuery, setSearchQuery] = useState('');
     const [members, setMembers] = useState([]);
 
     useEffect(() => {
-        fetch("http://localhost:3000/api/v0/room/members", {
-            method: 'POST',
-            credentials: "include",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ roomId: currentRoom.roomId })
-        })
-            .then((res) => res.json())
-            .then(({ statusCode, data, message }) => {
-                if (statusCode === 200) {
-                    const { members } = data[0]
-                    console.log(members);
-
-                    setMembers(members)
-                }
-            });
+        if (currentRoom.roomId) {
+            fetch("http://localhost:3000/api/v0/room/members", {
+                method: 'POST',
+                credentials: "include",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ roomId: currentRoom.roomId })
+            })
+                .then((res) => res.json())
+                .then(({ statusCode, data, message }) => {
+                    if (statusCode === 200) {
+                        const { members } = data[0]
+                        console.log(members);
+                        if (user) setMembers(members.filter(member => member.username != user.username))
+                    }
+                });
+        }
     }, [currentRoom])
 
     const filteredMembers = useMemo(() => {

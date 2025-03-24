@@ -20,7 +20,6 @@ export const getRooms = async (req: Request, res: Response<APIResponse>) => {
         let roomDetails;
         if (typeof (user) != 'string') {
             roomDetails = await getRoomsFromDB(user.username)
-
             res.cookie('rooms', cookieGenerator({ rooms: roomDetails }))
         }
         res.json({

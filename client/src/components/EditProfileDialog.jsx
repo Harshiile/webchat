@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
+import { toast } from 'sonner'
 
 const EditProfileDialog = ({ isOpen, onClose, onSave, currentData }) => {
     const [updateData, setUpdateData] = useState(currentData);
@@ -27,8 +28,11 @@ const EditProfileDialog = ({ isOpen, onClose, onSave, currentData }) => {
         })
             .then(res => {
                 if (res.status == 200) {
-                    console.log(updateData);
                     onSave(updateData);
+                    toast.success(`Profile Updated 🎉`, {
+                        duration: 5000,
+                        style: { backgroundColor: "#16a34a", color: "white", fontSize: "1rem" },
+                    });
                 }
             })
     };

@@ -115,7 +115,7 @@ export const getRoomsFromDB = async (username: string): Promise<Array<Object>> =
                     avatar: "$rooms.avatar",
                     isPrivate: "$rooms.isPrivate",
                     roomId: "$rooms._id",
-                    totalMembers: { $size: "$rooms.members" },
+                    members: "$rooms.members",
                 },
             },
             {

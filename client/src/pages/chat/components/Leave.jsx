@@ -7,6 +7,36 @@ const LeaveRoomDialog = ({ setLeaveRoomShow, setRoomLeavedConfirm, user }) => {
     if (!open) return null;
     const [currentRoom, setCurrentRoom] = useCurrentRoom()
     const [, setRooms] = useRooms()
+
+    const leaveRoomHandler = async () => {
+        fetch("http://localhost:3000/api/v0/room/delete",
+            {
+                credentials: "include",
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username: user.username, roomId: currentRoom.roomId })
+            }
+        )
+            .then((res) => res.json())
+            .then(({ statusCode, data, message }) => {
+                if (statusCode === 200) {
+                    if (data[0].length > 0) {
+                        setRooms(data[0])
+                        setCurrentRoom(data[0][0])
+                    }
+                    else {
+                        setRooms([])
+                        setCurrentRoom({ name: 'WebChat', avatar: '/uploads/user.png', roomId: '', members: [] })
+                    }
+                    localStorage.removeItem(currentRoom.roomId)
+                }
+            });
+        setLeaveRoomShow(false)
+        setRoomLeavedConfirm(true)
+    }
+
     return (
         <AnimatePresence>
             {open && (
@@ -40,28 +70,7 @@ const LeaveRoomDialog = ({ setLeaveRoomShow, setRoomLeavedConfirm, user }) => {
                                     No, stay
                                 </button>
                                 <button
-                                    onClick={() => {
-                                        fetch("http://localhost:3000/api/v0/room/delete",
-                                            {
-                                                credentials: "include",
-                                                method: 'POST',
-                                                headers: {
-                                                    'Content-Type': 'application/json'
-                                                },
-                                                body: JSON.stringify({ username: user.username, roomId: currentRoom.roomId })
-                                            }
-                                        )
-                                            .then((res) => res.json())
-                                            .then(({ statusCode, data, message }) => {
-                                                if (statusCode === 200) {
-                                                    setRooms(data[0])
-                                                    setCurrentRoom(data[0][0])
-                                                    localStorage.removeItem(currentRoom.roomId)
-                                                }
-                                            });
-                                        setLeaveRoomShow(false)
-                                        setRoomLeavedConfirm(true)
-                                    }}
+                                    onClick={leaveRoomHandler}
                                     className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200"
                                 >
                                     Yes, leave room

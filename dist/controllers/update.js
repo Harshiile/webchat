@@ -37,12 +37,10 @@ const updateUserInDB = (req, res) => __awaiter(void 0, void 0, void 0, function*
         deleteOldAvatar(oldavatar);
     }
     try {
-        const avatar = `/uploads/${((_a = req.file) === null || _a === void 0 ? void 0 : _a.filename) || ''}`;
+        const avatar = req.file ? `/uploads/${(_a = req.file) === null || _a === void 0 ? void 0 : _a.filename}` : oldavatar;
         yield (0, schema_1.updateUser)(oldUsername, newUsername, avatar, name);
         const loginCookie = (0, cookie_1.cookieGenerator)({ username: newUsername, name, avatar });
-        res.cookie('auth', loginCookie, {
-            httpOnly: true
-        });
+        res.cookie('auth', loginCookie);
         res.json({
             statusCode: 200,
             message: 'User Updated'

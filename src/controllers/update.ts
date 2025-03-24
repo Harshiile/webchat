@@ -32,12 +32,10 @@ export const updateUserInDB = async (req: Request<{}, {}, UpdateUser>, res: Resp
         deleteOldAvatar(oldavatar)
     }
     try {
-        const avatar = `/uploads/${req.file?.filename || ''}`
+        const avatar = req.file ? `/uploads/${req.file?.filename}` : oldavatar
         await updateUser(oldUsername, newUsername, avatar, name)
         const loginCookie = cookieGenerator({ username: newUsername, name, avatar })
-        res.cookie('auth', loginCookie, {
-            httpOnly: true
-        })
+        res.cookie('auth', loginCookie)
         res.json({
             statusCode: 200,
             message: 'User Updated'
