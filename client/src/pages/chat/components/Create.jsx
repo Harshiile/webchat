@@ -41,6 +41,10 @@ const CreateRoom = ({ closeModal }) => {
                 setRooms((rooms) => [...rooms, data[0]])
                 setCurrentRoom(data[0])
                 socket.emit('room-create', { roomId: data[0].roomId })
+                toast.success(`${message} 🎉`, {
+                    duration: 5000,
+                    style: { backgroundColor: "#16a34a", color: "white", fontSize: "1rem" },
+                });
             }
         })
     };

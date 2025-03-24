@@ -8,6 +8,7 @@ import { useDebouncedCallback } from 'use-debounce';
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import GoogleAuth from "../../auth/Google";
 import { Helmet } from "react-helmet-async";
+import logo from '/logo.png'
 
 const Signup = () => {
     const [username, setUsername] = useState("");
@@ -109,6 +110,7 @@ const Signup = () => {
         <>
             <Helmet>
                 <title>SignUp | WebChat</title>
+                <link rel="icon" type="image/png" href={logo} />
             </Helmet>
             <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
                 <GoogleOAuthProvider clientId={import.meta.env.VITE_CLIENT_ID}>

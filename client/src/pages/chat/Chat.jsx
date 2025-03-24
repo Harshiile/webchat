@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { MessageSquare, Plus, Users, User, UserCheck, UserMinus, Users2, Share2, LogOut, Send, ChevronDown, UserPlus } from "lucide-react";
+import { Plus, Users, Users2, Share2, LogOut, Send, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import RoomsList from "./components/RoomList";
@@ -16,6 +16,7 @@ import { useCurrentRoom } from "../../context/currentRoom";
 import RoomMembers from "./components/RoomMembers";
 import { Helmet } from "react-helmet-async";
 import { useRooms } from "../../context/rooms";
+import logo from '/logo.png'
 
 const Chat = () => {
     const [roomError, setRoomError] = useRoomError()
@@ -34,12 +35,15 @@ const Chat = () => {
     const [showMembersDropdown, setShowMembersDropdown] = useState(false);
 
     useEffect(() => {
-        if (roomError) {
-            toast.success(`${modalType === "create" ? "Room created!" : "Joined room!"}`);
-            setTimeout(() => {
-                setRoomError(false)
-            }, 2000);
+        if (roomError.error) {
+            toast.success(`${roomError.message} `, {
+                duration: 5000,
+                style: { backgroundColor: "#dc2626", color: "white", fontSize: "1rem" },
+            });
         }
+        setTimeout(() => {
+            setRoomError(false)
+        }, 2000);
     }, [roomError])
 
     const messagesEndRef = useRef(null);
@@ -134,14 +138,14 @@ const Chat = () => {
         <>
             <Helmet>
                 <title>Chat | WebChat</title>
+                <link rel="icon" type="image/png" href={logo} />
             </Helmet>
             <div className="h-screen w-screen text-white flex flex-col bg-black overflow-hidden">
                 <ToastProvider />
                 {/* Navbar */}
                 <motion.nav initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="bg-zinc-900 px-6 py-4 border-b border-zinc-800 flex items-center justify-between">
                     <div className="flex items-center space-x-2">
-                        <MessageSquare className="w-6 h-6" />
-                        <span className="text-xl font-bold">ChatApp</span>
+                        <img src={logo} className="w-13 h-13" />
                     </div>
 
                     {/* User Avatar with Hover Effect */}

@@ -12,6 +12,7 @@ const roomSchema = new mongoose.Schema<Rooms>({
     members: Array<String>
 })
 
+
 const roomModel = mongoose.model<Rooms>('rooms', roomSchema)
 
 export const addRoom = async ({ name, avatar, createBy, isPrivate }: Rooms, roomCookie: string) => {
@@ -49,11 +50,15 @@ export const addRoom = async ({ name, avatar, createBy, isPrivate }: Rooms, room
 
 export const roomDelete = async (username: string, roomId: mongoose.Types.ObjectId, roomCookie: string) => {
     try {
-        await roomModel.findByIdAndUpdate(roomId, {
+        const deletedRoom = await roomModel.findByIdAndUpdate(roomId, {
             $pull: {
                 members: username
             }
-        }) // If remaining user=0, delete entire room document
+        })
+        if (deletedRoom?.members && deletedRoom.members.length <= 1) {
+            // If remaining user=0, delete entire room document 
+            await roomModel.findByIdAndDelete(deletedRoom._id)
+        }
 
         // remove that room from user
         await removeRoomToUser(username, roomId)
@@ -78,6 +83,15 @@ export const roomJoin = async (username: string, roomId: mongoose.Types.ObjectId
         const roomExist = await roomModel.findById(roomId);
         if (roomExist) {
             try {
+                if (roomExist?.members?.includes(username)) {
+                    const existedRooms = getRoomsFromCookie(roomCookie) || []
+                    return {
+                        // User already in room
+                        error: true,
+                        message: 'You already in this room',
+                        roomsToken: roomCookie
+                    }
+                }
                 await roomModel.findByIdAndUpdate(roomId, {
                     $push: {
                         members: username
@@ -86,6 +100,8 @@ export const roomJoin = async (username: string, roomId: mongoose.Types.ObjectId
 
                 // change cookie
                 const existedRooms = getRoomsFromCookie(roomCookie) || []
+                console.log('existedRooms : ', existedRooms);
+
                 const newRoom = {
                     name: roomExist.name,
                     avatar: roomExist.avatar,
@@ -100,7 +116,7 @@ export const roomJoin = async (username: string, roomId: mongoose.Types.ObjectId
                 throw new Error("Database not responding while joining room");
             }
         }
-        return {
+        else return {
             // Room not exist
             error: true,
             message: 'Room not exist'

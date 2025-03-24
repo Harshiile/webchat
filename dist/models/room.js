@@ -61,11 +61,15 @@ const addRoom = (_a, roomCookie_1) => __awaiter(void 0, [_a, roomCookie_1], void
 exports.addRoom = addRoom;
 const roomDelete = (username, roomId, roomCookie) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield roomModel.findByIdAndUpdate(roomId, {
+        const deletedRoom = yield roomModel.findByIdAndUpdate(roomId, {
             $pull: {
                 members: username
             }
-        }); // If remaining user=0, delete entire room document
+        });
+        if ((deletedRoom === null || deletedRoom === void 0 ? void 0 : deletedRoom.members) && deletedRoom.members.length <= 1) {
+            // If remaining user=0, delete entire room document 
+            yield roomModel.findByIdAndDelete(deletedRoom._id);
+        }
         // remove that room from user
         yield (0, schema_1.removeRoomToUser)(username, roomId);
         // change cookie
@@ -85,12 +89,21 @@ const isRoomExists = (roomId) => __awaiter(void 0, void 0, void 0, function* () 
 });
 exports.isRoomExists = isRoomExists;
 const roomJoin = (username, roomId, roomCookie) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
+    var _a, _b;
     // 1. Check whether room is exist or not
     try {
         const roomExist = yield roomModel.findById(roomId);
         if (roomExist) {
             try {
+                if ((_a = roomExist === null || roomExist === void 0 ? void 0 : roomExist.members) === null || _a === void 0 ? void 0 : _a.includes(username)) {
+                    const existedRooms = (0, getRoomsFromCookie_1.getRoomsFromCookie)(roomCookie) || [];
+                    return {
+                        // User already in room
+                        error: true,
+                        message: 'You already in this room',
+                        roomsToken: roomCookie
+                    };
+                }
                 yield roomModel.findByIdAndUpdate(roomId, {
                     $push: {
                         members: username
@@ -98,12 +111,13 @@ const roomJoin = (username, roomId, roomCookie) => __awaiter(void 0, void 0, voi
                 });
                 // change cookie
                 const existedRooms = (0, getRoomsFromCookie_1.getRoomsFromCookie)(roomCookie) || [];
+                console.log('existedRooms : ', existedRooms);
                 const newRoom = {
                     name: roomExist.name,
                     avatar: roomExist.avatar,
                     roomId: roomExist._id.toString(),
                     isPrivate: roomExist.isPrivate,
-                    totalMembers: ((_a = roomExist.members) === null || _a === void 0 ? void 0 : _a.length) || 0 + 1
+                    totalMembers: ((_b = roomExist.members) === null || _b === void 0 ? void 0 : _b.length) || 0 + 1
                 };
                 const newRooms = [...existedRooms, newRoom];
                 return { newRoom, roomsToken: (0, cookie_1.cookieGenerator)({ rooms: newRooms }) };
@@ -113,11 +127,12 @@ const roomJoin = (username, roomId, roomCookie) => __awaiter(void 0, void 0, voi
                 throw new Error("Database not responding while joining room");
             }
         }
-        return {
-            // Room not exist
-            error: true,
-            message: 'Room not exist'
-        };
+        else
+            return {
+                // Room not exist
+                error: true,
+                message: 'Room not exist'
+            };
     }
     catch (error) {
         console.log('Error : ', error);

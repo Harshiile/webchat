@@ -8,6 +8,7 @@ import { useRooms } from "../../context/rooms";
 import { useCurrentRoom } from "../../context/currentRoom";
 import { socket } from "../../socket";
 import { Helmet } from "react-helmet-async";
+import logo from '/logo.png'
 
 const Profile = () => {
     const navigate = useNavigate()
@@ -92,6 +93,7 @@ const Profile = () => {
         <>
             <Helmet>
                 <title>Profile | WebChat</title>
+                <link rel="icon" type="image/png" href={logo} />
             </Helmet>
             <div className="min-h-screen flex flex-col items-center bg-black text-white">
                 <ToastProvider />
@@ -102,9 +104,9 @@ const Profile = () => {
                     currentData={user}
                 />
 
-                <section className="w-full h-screen flex flex-col relative p-4 md:p-6 bg-zinc-900/50">
-                    <div className="flex justify-between items-start mb-8">
-                        <h1 className="text-2xl md:text-3xl font-bold px-4">WEBCHAT</h1>
+                <section className="w-full h-screen flex flex-col relative bg-zinc-900/50">
+                    <div className="flex justify-between mb-8  px-6 py-4 ">
+                        <img src={logo} className="w-13 h-13" />
                         <div className="flex items-center gap-4 px-4">
                             <div className="relative">
                                 <button

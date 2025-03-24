@@ -56,20 +56,32 @@ export const roomDeleteController = async (req: Request<{}, {}, { roomId: mongoo
     }
 }
 export const roomJoinController = async (req: Request<{}, {}, { roomId: mongoose.Types.ObjectId, username: string }>, res: Response<APIResponse>) => {
-
     const { username } = req.body;
     let { roomId } = req.body;
-    roomId = new mongoose.Types.ObjectId(roomId);
-    //add roomId to userModel
-    addRoomToUser(username, roomId);
-    // add userId to members array in roomModel
-    const { roomsToken, newRoom } = await roomJoin(username, roomId, req.cookies['rooms'])
-    res.cookie('rooms', roomsToken)
-    res.json({
-        statusCode: 200,
-        message: 'Room Joined Successfully',
-        data: [
-            newRoom
-        ]
+
+    if (mongoose.isValidObjectId(roomId)) {
+        roomId = new mongoose.Types.ObjectId(roomId);
+        // add userId to members array in roomModel
+        const { roomsToken, newRoom, error, message } = await roomJoin(username, roomId, req.cookies['rooms'])
+        //add roomId to userModel
+        !error && addRoomToUser(username, roomId);
+        res.cookie('rooms', roomsToken)
+        if (error) {
+            res.json({
+                statusCode: 400,
+                message
+            })
+        }
+        else res.json({
+            statusCode: 200,
+            message: 'Room Joined Successfully',
+            data: [
+                newRoom
+            ]
+        })
+    }
+    else res.json({
+        statusCode: 400,
+        message: 'Room Link is not valid'
     })
 }

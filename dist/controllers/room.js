@@ -73,18 +73,32 @@ exports.roomDeleteController = roomDeleteController;
 const roomJoinController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { username } = req.body;
     let { roomId } = req.body;
-    roomId = new mongoose_1.default.Types.ObjectId(roomId);
-    //add roomId to userModel
-    (0, schema_1.addRoomToUser)(username, roomId);
-    // add userId to members array in roomModel
-    const { roomsToken, newRoom } = yield (0, room_1.roomJoin)(username, roomId, req.cookies['rooms']);
-    res.cookie('rooms', roomsToken);
-    res.json({
-        statusCode: 200,
-        message: 'Room Joined Successfully',
-        data: [
-            newRoom
-        ]
-    });
+    if (mongoose_1.default.isValidObjectId(roomId)) {
+        roomId = new mongoose_1.default.Types.ObjectId(roomId);
+        // add userId to members array in roomModel
+        const { roomsToken, newRoom, error, message } = yield (0, room_1.roomJoin)(username, roomId, req.cookies['rooms']);
+        //add roomId to userModel
+        !error && (0, schema_1.addRoomToUser)(username, roomId);
+        res.cookie('rooms', roomsToken);
+        if (error) {
+            res.json({
+                statusCode: 400,
+                message
+            });
+        }
+        else
+            res.json({
+                statusCode: 200,
+                message: 'Room Joined Successfully',
+                data: [
+                    newRoom
+                ]
+            });
+    }
+    else
+        res.json({
+            statusCode: 400,
+            message: 'Room Link is not valid'
+        });
 });
 exports.roomJoinController = roomJoinController;

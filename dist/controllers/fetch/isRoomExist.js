@@ -16,14 +16,21 @@ exports.IsRoomExistController = void 0;
 const room_1 = require("../../models/room");
 const mongoose_1 = __importDefault(require("mongoose"));
 const IsRoomExistController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    res.json({
-        statusCode: 200,
-        message: 'Is room exists?',
-        data: [
-            {
-                "isRoomExist": yield (0, room_1.isRoomExists)(new mongoose_1.default.Types.ObjectId(req.body.roomId))
-            }
-        ]
-    });
+    if (mongoose_1.default.isValidObjectId(req.body.roomId)) {
+        res.json({
+            statusCode: 200,
+            message: 'Is room exists?',
+            data: [
+                {
+                    "isRoomExist": yield (0, room_1.isRoomExists)(new mongoose_1.default.Types.ObjectId(req.body.roomId))
+                }
+            ]
+        });
+    }
+    else
+        res.json({
+            statusCode: 400,
+            message: 'Room Link is not valid'
+        });
 });
 exports.IsRoomExistController = IsRoomExistController;

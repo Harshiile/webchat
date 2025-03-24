@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import Modal from "./Model";
@@ -35,6 +35,13 @@ const JoinRoom = ({ closeModal }) => {
                 setRooms(rooms => [...rooms, data[0]])
                 setCurrentRoom(data[0])
                 socket.emit('room-join', { roomId })
+            }
+            else {
+                closeModal()
+                toast.success(`${message} `, {
+                    duration: 5000,
+                    style: { backgroundColor: "#dc2626", color: "white", fontSize: "1rem" },
+                });
             }
         })
     };

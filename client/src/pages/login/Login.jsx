@@ -7,6 +7,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google'
 import ToastProvider from "../../components/ToastProvider";
 import GoogleAuth from "../../auth/Google";
 import { Helmet } from "react-helmet-async";
+import logo from '/logo.png'
 
 const Login = () => {
     const [email, setEmail] = useState("");
@@ -72,6 +73,7 @@ const Login = () => {
         <>
             <Helmet>
                 <title>Login | WebChat</title>
+                <link rel="icon" type="image/png" href={logo} />
             </Helmet>
             <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
                 <GoogleOAuthProvider clientId={import.meta.env.VITE_CLIENT_ID}>
